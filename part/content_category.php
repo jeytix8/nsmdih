@@ -10,7 +10,7 @@ if (!isset($_SESSION['secured'])) {
 
 require_once 'connect.php'; // Adjust based on your actual connection file
 
-$query = "SELECT id, category, type FROM category_job_order ORDER BY id ASC";
+$query = "SELECT id, category FROM category_job_order ORDER BY id ASC";
 $result = mysqli_query($conn, $query);
 ?>
 
@@ -23,12 +23,10 @@ $result = mysqli_query($conn, $query);
     <link rel="stylesheet" href="styles.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-
-        /* Ensure the modal covers the full screen */
         .modal {
             display: none;
             position: fixed;
-            z-index: 1000; /* Ensure it appears on top */
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
@@ -36,7 +34,6 @@ $result = mysqli_query($conn, $query);
             background-color: rgba(0, 0, 0, 0.5);
         }
 
-        /* Style the modal content */
         .modal-content {
             background-color: white;
             padding: 20px;
@@ -47,7 +44,6 @@ $result = mysqli_query($conn, $query);
             position: relative;
         }
 
-        /* Close button styling */
         .close-btn {
             position: absolute;
             top: 10px;
@@ -141,30 +137,27 @@ $result = mysqli_query($conn, $query);
         <span class="close-btn" onclick="closeInsertModal()">&times;</span>
         <h2>Add New Category</h2>
         <input type="text" id="newCategoryName" placeholder="Enter category name">
-        <input type="text" id="newCategoryType" placeholder="Enter category type">
         <br><br>
         <button class="insert-btn" onclick="insertCategory()">Insert</button>
     </div>
 </div>
 
-
+<!-- Category Table -->
 <table class='content-category-table' id='content_category_table'>
     <thead>
         <tr>
-            <th>ID</th>
+            <th hidden>ID</th>
             <th>Category</th>
-            <th>Type</th> <!-- New Column -->
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
         <?php while ($row = $result->fetch_assoc()) { ?>
             <tr>
-                <td><?php echo htmlspecialchars($row['id']); ?></td>
+                <td hidden><?php echo htmlspecialchars($row['id']); ?></td>
                 <td><?php echo htmlspecialchars($row['category']); ?></td>
-                <td><?php echo htmlspecialchars($row['type']); ?></td>
                 <td>
-                    <button class="action-button update-btn" onclick="updateCategory(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars($row['category']); ?>', '<?php echo htmlspecialchars($row['type']); ?>')">Update</button>
+                    <button class="action-button update-btn" onclick="updateCategory(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars($row['category']); ?>')">Update</button>
                     <button class="action-button delete-btn" onclick="deleteCategory(<?php echo $row['id']; ?>)">Delete</button>
                 </td>
             </tr>
@@ -205,28 +198,25 @@ $result = mysqli_query($conn, $query);
         }
     }
 
-
     function insertCategory() {
         let categoryName = document.getElementById("newCategoryName").value.trim();
-        let categoryType = document.getElementById("newCategoryType").value.trim();
 
-        if (categoryName === "" || categoryType === "") {
-            alert("Please enter both category name and type.");
+        if (categoryName === "") {
+            alert("Please enter a category name.");
             return;
         }
 
-        $.post('part/insert_category.php', { category: categoryName, type: categoryType }, function(response) {
+        $.post('part/insert_category.php', { category: categoryName }, function(response) {
             alert(response);
             location.reload();
         });
     }
 
-    function updateCategory(id, oldCategory, oldType) {
+    function updateCategory(id, oldCategory) {
         let newCategory = prompt("Enter new category name:", oldCategory);
-        let newType = prompt("Enter new category type:", oldType);
 
-        if (newCategory && newType) {
-            $.post('part/update_category.php', { id: id, category: newCategory, type: newType }, function(response) {
+        if (newCategory) {
+            $.post('part/update_category.php', { id: id, category: newCategory }, function(response) {
                 alert(response);
                 location.reload();
             });

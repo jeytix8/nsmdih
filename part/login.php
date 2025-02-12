@@ -23,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($id) || empty($password)) {
         $message = "Please enter a valid username and password.";
     } else {
-        // Query to fetch account details
-        $query = "SELECT id, password, type, status FROM accounts WHERE id = ? LIMIT 1";
+        // Adjusted query to match your database structure
+        $query = "SELECT id, password, section FROM accounts WHERE id = ? LIMIT 1";
         $stmt = mysqli_prepare($conn, $query);
 
         if (!$stmt) {
@@ -39,34 +39,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($result && mysqli_num_rows($result) > 0) {
             $row = mysqli_fetch_assoc($result);
 
-            // Check if account is archived
-            if (($row["status"]) === 'Inactive') {
-                $message = "This account is archived and cannot be used for login.";
+            // Verify password
+            if (password_verify($password, $row["password"])) {
+                // Regenerate session ID to prevent session fixation
+                session_regenerate_id(true);
+
+                // Store user information in session
+                $_SESSION['secured'] = $row["id"];
+                $_SESSION['user_section'] = $row["section"]; // Store section
+                $_SESSION['last_activity'] = time(); // Set last activity time
+
+                // Redirect to the dashboard or home page
+                header('Location: ../index.php');
+                exit();
             } else {
-                // Verify password
-                if (password_verify($password, $row["password"])) {
-                    $user_type = $row["type"];
-
-                    // Restrict access for specific user types
-                    if ($user_type === 'student' || $user_type === 'faculty') {
-                        $message = "Student and Faculty accounts cannot log in.";
-                    } else {
-                        // Regenerate session ID to prevent session fixation
-                        session_regenerate_id(true);
-
-                        // Store user information in session
-                        $_SESSION['secured'] = $row["id"];
-                        $_SESSION['user_type'] = $user_type;
-                        $_SESSION['last_activity'] = time(); // Set last activity time
-
-
-                        // Redirect to the dashboard or home page
-                        header('Location: ../index.php');
-                        exit();
-                    }
-                } else {
-                    $message = "Invalid password.";
-                }
+                $message = "Invalid password.";
             }
         } else {
             $message = "Invalid username or account does not exist.";
@@ -79,7 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 mysqli_close($conn);
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,8 +75,8 @@ mysqli_close($conn);
     <link href="../assets/css/style.bundle.css" rel="stylesheet">
     <style>
         body {
-            background: url('../background.jpg') no-repeat top center fixed; /* Align to the top */
-            background-size: cover; /* Ensure the whole image is visible while maintaining aspect ratio */
+            background: url('../background.jpg') no-repeat top center fixed;
+            background-size: cover;
             height: 100vh;
             margin: 0;
             display: flex;
@@ -130,7 +116,7 @@ mysqli_close($conn);
                 <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
             </div>
             <div class="d-grid">
-                <button style="background-color: #090145; color: whitesmoke; margin-top: 13px;" id="buttonw" type="submit" name="submit" id="buttonw" class="btn btn-success">Login</button>
+                <button style="background-color: #090145; color: whitesmoke; margin-top: 13px;" id="buttonw" type="submit" name="submit" class="btn btn-success">Login</button>
             </div>
             <!-- Display the message here -->
             <?php if (!empty($message)): ?>
@@ -144,10 +130,9 @@ mysqli_close($conn);
         window.onload = function() {
             var logoutMessage = document.getElementById('logoutMessage');
             if (logoutMessage) {
-                // Hide the message after 3 seconds
                 setTimeout(function() {
                     logoutMessage.style.display = 'none';
-                }, 3000);  // Adjust the time in milliseconds (3000 ms = 3 seconds)
+                }, 3000);
             }
         };
     </script>

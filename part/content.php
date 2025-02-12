@@ -11,12 +11,6 @@ if (!isset($_SESSION['secured'])) {
 
 $section = isset($_GET['section']) ? $_GET['section'] : 'dashboard';  // Set default section to 'dashboard'
 
-// Include the appropriate analytics file based on the 'analytics' query parameter
-if (isset($_GET['analytics'])) {
-    if ($_GET['analytics'] === 'analytics_remarks') {
-        include 'analytics.php';
-    }
-}
 ?>
 
 <div class="d-flex flex-column flex-column-fluid" style="background-color: whitesmoke; height: auto;">
