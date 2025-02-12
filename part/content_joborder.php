@@ -7,7 +7,7 @@ if (!isset($_SESSION['secured'])) {
     header('Location: login.php');
     exit();
 }
-
+include('connect.php');
 // Fetch Departments
 $departments = [];
 $deptQuery = "SELECT DISTINCT department FROM records_job_order ORDER BY department ASC";

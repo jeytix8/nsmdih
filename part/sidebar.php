@@ -60,7 +60,7 @@ if (!isset($_SESSION['secured'])) {
 	<!--begin::sidebar menu-->
 	<div class="app-sidebar-menu overflow-hidden flex-column-fluid">
 		<!--begin::Menu wrapper--> 
-		<div id="kt_app_sidebar_menu_wrapper" class="app-sidebar-wrapper" data-user-type="<?php echo $_SESSION['user_type']; ?>">
+		<div id="kt_app_sidebar_menu_wrapper" class="app-sidebar-wrapper">
 			<!--begin::Scroll wrapper-->
 			<div id="kt_app_sidebar_menu_scroll" class="scroll-y my-5 mx-3" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer" data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px" data-kt-scroll-save-state="true">
 				<!--begin::Menu-->
@@ -94,7 +94,7 @@ if (!isset($_SESSION['secured'])) {
 					<!--begin:Menu item-->
 					<div  class="menu-item">
                         <!--begin:Menu link-->
-                        <a class="menu-link" href="#" onclick="showSection(event, 'records', 'analytics_remarks', true);">
+                        <a class="menu-link" href="#" onclick="showSection(event, 'records', true);">
                            <span class="menu-icon">
                                 <span class="svg-icon svg-icon-2" style="color: yellow;">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -206,24 +206,7 @@ if (!isset($_SESSION['secured'])) {
 
 
 <script>    
-document.addEventListener('DOMContentLoaded', function() {
-    const user_type = "<?php echo $_SESSION['user_type']; ?>";
 
-    if (user_type === 'administrator') {
-        const elementsToShow = [
-            document.getElementById('accounts-menu'),
-            document.getElementById('audit_trail'),
-            document.getElementById('computer_availability'),
-            document.getElementById('two')
-        ];
-
-        elementsToShow.forEach(element => {
-            if (element) {
-                element.style.display = 'block';  // Make sure to change to 'block'
-            }
-        });
-    }
-});
 
     function showSection(event, sectionId, analyticsPage, isLogHistory = false) {
         event.preventDefault(); // Prevent default action

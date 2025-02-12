@@ -56,8 +56,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $current_day = date("d");
     $current_time = date("H:i:s");
 
-    $insert_stmt = $conn->prepare("INSERT INTO records_job_order (name, department, job_order_nature, description, issue_year, issue_month, issue_day, issue_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $insert_stmt->bind_param("ssssssss", $name, $department, $job_order_nature, $description, $current_year, $current_month, $current_day, $current_time);
+    $satisfied_count = 0;
+    $unsatisfied_count = 0;
+    $total_weight = 20;
+
+    $categories = ['time_of_response', 'time_of_resolution', 'communication_clarity', 'quality_of_support', 'professionalism'];
+
+    foreach ($categories as $category) {
+        if (isset($_POST[$category])) {
+            if (strpos($_POST[$category], 'y_') === 0) {
+                $satisfied_count++;
+            } else {
+                $unsatisfied_count++;
+            }
+        }
+    }
+
+    $satisfied_percentage = $satisfied_count * $total_weight;
+    $unsatisfied_percentage = $unsatisfied_count * $total_weight;
+
+    $insert_stmt = $conn->prepare("INSERT INTO records_job_order (name, department, job_order_nature, description, issue_year, issue_month, issue_day, issue_time, satisfied, unsatisfied) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $insert_stmt->bind_param("ssssssssss", $name, $department, $job_order_nature, $description, $current_year, $current_month, $current_day, $current_time, $satisfied_percentage, $unsatisfied_percentage);
 
     if ($insert_stmt->execute()) {
         echo json_encode(['success' => true]);
@@ -88,7 +107,7 @@ ob_end_flush();
         position: absolute; 
         top: 50%; 
         left: 58%; 
-        height: 53vh;
+        height: 87vh;
         transform: translate(-50%, -50%);
     }
 
@@ -154,6 +173,35 @@ ob_end_flush();
     }
     
 
+    .rating-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        margin-bottom: 20px;
+    }
+
+    .rating-table th, .rating-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+
+    .rating-table td{
+        font-size: 12px;
+    }
+
+    .rating-table th {
+        background-color: #1a0c80;
+        color: white;
+        font-weight: bold;
+    }
+
+    .rating-table input[type="radio"] {
+        transform: scale(1.2); /* Adjust size if needed */
+        margin: 0;
+        vertical-align: middle;
+    }
+
 
 </style>
 
@@ -193,6 +241,43 @@ ob_end_flush();
                 <label for="description">Description</label>
                 <input type="text" id="description" name="description" class="form-control" placeholder="Enter description">
             </div>
+
+            <table class="rating-table">
+                <thead>
+                    <tr>
+                        <th>Categories</th>
+                        <th>Satisfied</th>
+                        <th>Unsatisfied</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Time of Response</td>
+                        <td><input type="radio" name="time_of_response" value="y_timeofresponse" required></td>
+                        <td><input type="radio" name="time_of_response" value="n_timeofresponse" required></td>
+                    </tr>
+                    <tr>
+                        <td>Time of Resolution</td>
+                        <td><input type="radio" name="time_of_resolution" value="y_timeofresolution" required></td>
+                        <td><input type="radio" name="time_of_resolution" value="n_timeofresolution" required></td>
+                    </tr>
+                    <tr>
+                        <td>Communicated Clearly</td>
+                        <td><input type="radio" name="communication_clarity" value="y_communication" required></td>
+                        <td><input type="radio" name="communication_clarity" value="n_communication" required></td>
+                    </tr>
+                    <tr>
+                        <td>Quality of Support</td>
+                        <td><input type="radio" name="quality_of_support" value="y_quality" required></td>
+                        <td><input type="radio" name="quality_of_support" value="n_quality" required></td>
+                    </tr>
+                    <tr>
+                        <td>Professionalism of Support Team</td>
+                        <td><input type="radio" name="professionalism" value="y_professionalism" required></td>
+                        <td><input type="radio" name="professionalism" value="n_professionalism" required></td>
+                    </tr>
+                </tbody>
+            </table>
 
             <button type="submit" id="button">Submit</button>
         </form>

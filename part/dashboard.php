@@ -12,6 +12,7 @@ if (!isset($_SESSION['secured'])) {
 
 // Include the database connection file
 include('connect.php');
+include 'analytics.php';
 
 // ----------------- Fetch Data for department and PC Counts for Logs -----------------
 $querydepartments = "SELECT DISTINCT department FROM records_job_order ORDER BY department ASC";
