@@ -16,7 +16,7 @@ if (!isset($_SESSION['secured']) || !isset($_SESSION['user_section'])) {
     exit();
 }
 
-$user_section = $_SESSION['user_section']; // User's department
+$user_section = $_SESSION['user_section']; // User's section
 
 $job_orders = [];
 
@@ -42,11 +42,11 @@ $emp_stmt->close();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'] ?? '';
-    $department = $_SESSION['user_section']; // Set from session
+    $section = $_SESSION['user_section']; // Set from session
     $description = $_POST['description'] ?? '';
     $job_order_nature = $_POST['job_order_nature'] ?? '';
 
-    if (empty($name) || empty($department) || empty($job_order_nature)) {
+    if (empty($name) || empty($section) || empty($job_order_nature)) {
         echo json_encode(['success' => false, 'message' => 'All fields are required.']);
         exit();
     }
@@ -55,9 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $current_month = date("F");
     $current_day = date("d");
     $current_time = date("H:i:s");
+    $status = "In Queue";
 
-    $insert_stmt = $conn->prepare("INSERT INTO records_job_order (name, department, job_order_nature, description, issue_year, issue_month, issue_day, issue_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $insert_stmt->bind_param("ssssssss", $name, $department, $job_order_nature, $description, $current_year, $current_month, $current_day, $current_time);
+    $insert_stmt = $conn->prepare("INSERT INTO records_job_order (name, section, job_order_nature, description, issue_year, issue_month, issue_day, issue_time, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $insert_stmt->bind_param("sssssssss", $name, $section, $job_order_nature, $description, $current_year, $current_month, $current_day, $current_time, $status);
 
     if ($insert_stmt->execute()) {
         echo json_encode(['success' => true]);
@@ -174,8 +175,8 @@ ob_end_flush();
                 </div>
 
                 <div class="form-group">
-                    <label for="department">Department</label>
-                    <input type="text" id="department" name="department" class="form-control" value="<?php echo htmlspecialchars($_SESSION['user_section']); ?>" readonly>
+                    <label for="section">Section</label>
+                    <input type="text" id="section" name="section" class="form-control" value="<?php echo htmlspecialchars($_SESSION['user_section']); ?>" readonly>
                 </div>
             </div>
 

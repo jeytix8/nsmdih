@@ -14,7 +14,7 @@ if (!isset($_SESSION['secured'])) {
         width: 100%;
         border-collapse: collapse;
         margin: 20px 0;
-        font-size: 13px;
+        font-size: 11px;
         text-align: center;
     }
     .issue-log-table th, .issue-log-table td {
@@ -136,8 +136,10 @@ if (!isset($_SESSION['secured'])) {
                     display: none;
                 }
             }
-/* Initially hide the dropdown */
 
+.assign-to-dropdown {
+    height: 30px;
+}
 
 .button-container2 {
     display: flex;
@@ -219,56 +221,33 @@ if (!isset($_SESSION['secured'])) {
 }
 </style>
 
-<div id="issue_ticket">
-    <div class="button-container2">
-        <!-- Filter and Search Section -->
-        <div class="filter-search-container">
-            <!-- Filtering Dropdown with Clickable Button -->
-            <div class="search-bar-container">
-                <input type="text" id="search-bar" placeholder="Search" onkeyup="searchTable()">
-            </div>
-            <div class="dropdown2">
-                <button class="dropdown2-btn">
-                    <i style="color: black;" class="bi bi-funnel-fill"></i>
-                </button>
-                <div class="dropdown2-content">
-                    <select id="status-filter" onchange="applyFilter()">
-                        <option value="All">All</option>
-                        <option value="Resolved">Resolved</option>
-                        <option value="Ongoing">Ongoing</option>
-                        <option value="Not Resolved">Not Resolved</option>
-                    </select>
+    <div id="issue_ticket">
+        <div class="button-container2">
+            <!-- Filter and Search Section -->
+            <div class="filter-search-container">
+                <!-- Filtering Dropdown with Clickable Button -->
+                <div class="search-bar-container">
+                    <input type="text" id="search-bar" placeholder="Search" onkeyup="searchTable()">
+                </div>
+                <div class="dropdown2">
+                    <button class="dropdown2-btn">
+                        <i style="color: black;" class="bi bi-funnel-fill"></i>
+                    </button>
+                    <div class="dropdown2-content">
+                        <select id="status-filter" onchange="applyFilter()">
+                            <option value="All">All</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Ongoing">Ongoing</option>
+                            <option value="Not Resolved">Not Resolved</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <!-- Search bar -->
-            
+            <!-- Print button -->
+            <button class="button" onclick="printPage()">Print This Page</button>
         </div>
-
-        <!-- Print button -->
-        <button class="button" onclick="printPage()">Print This Page</button>
     </div>
-</div>
-
-
-
-
-
-
-<!-- Modal Structure -->
-<div id="statusModal" class="modal">
-    <div class="modal-content">
-        <span class="close" id="closeModal">&times;</span>
-        <h5>Confirm Status Update</h5>
-        <p id="modalMessage"></p>
-        <label for="remarksInput">Remarks</label>
-        <textarea id="remarksInput" placeholder="Enter remarks here..." required></textarea>
-        <br>
-        <button id="confirmUpdate" class="confirm-button">Confirm</button>
-        <button id="cancelUpdate" class="confirm-button">Cancel</button>
-    </div>
-</div>
-
 
     <table class='issue-log-table' id='issue_log_table'>
         <thead>
@@ -279,69 +258,78 @@ if (!isset($_SESSION['secured'])) {
                 <th onclick="sortTable('section')">Section <i class='fas fa-sort'></i></th>
                 <th onclick="sortTable('job_order_nature')">Nature of Job Order <i class='fas fa-sort'></i></th>
                 <th onclick="sortTable('description')">Description <i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('assign_to')">Assign To <i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('status')">Status <i class='fas fa-sort'></i></th> <!-- Now plain text -->
+                <th onclick="sortTable('assign_to')">Assign To <i class='fas fa-sort'></i></th> <!-- Dropdown -->
+                <th onclick="sortTable('status')">Status <i class='fas fa-sort'></i></th>
                 <th onclick="sortTable('satisfied')">Satisfied <i class='fas fa-sort'></i></th>
                 <th onclick="sortTable('unsatisfied')">Unsatisfied <i class='fas fa-sort'></i></th>
             </tr>
         </thead>
         <tbody>
-         
-            <?php
-          
-            ?>
+            <!-- Data will be loaded dynamically from update_status_superadmin.php -->
         </tbody>
     </table>
+
 </div>
 
 <script>
 $(document).ready(function() {
     loadTableData();
 
+    // Update "Assign To" and "Status" when dropdown is changed
+    $(document).on('change', '.assign-to-dropdown', function() {
+        let id = $(this).data('id');
+        let assignTo = $(this).val();
+        updateAssignment(id, assignTo);
+    });
+
+    // Apply filter when the status dropdown is changed
     $('#status-filter').change(function() {
-        filterValue = $(this).val();
-        filterData('status', filterValue);
+        let filterValue = $(this).val();
+        loadTableData(filterValue);
     });
 });
 
-// Function to load table data
-function loadTableData() {
+// Function to update assignment & status via AJAX
+function updateAssignment(id, assignTo) {
     $.ajax({
-        url: 'part/update_status.php',
+        url: 'part/update_status_superadmin.php',
+        type: 'POST',
+        data: { id: id, assign_to: assignTo },
+        dataType: 'json',
+        success: function(response) {
+            alert(response.message);
+            $(`.status-column[data-id='${id}']`).text(response.status);
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX error:', error);
+        }
+    });
+}
+
+// Function to load table data with sorting, searching, and filtering
+function loadTableData(search = '', sort_by = 'id', order = 'DESC') {
+    $.ajax({
+        url: 'part/update_status_superadmin.php',
         type: 'GET',
+        data: { search: search, sort_by: sort_by, order: order },
         success: function(data) {
             $('#issue_log_table tbody').html(data);
         }
     });
 }
 
-// Function to filter data
-function filterData(column, value) {
-    $.ajax({
-        url: 'part/update_status.php',
-        type: 'GET',
-        data: { filter_by: column, filter_value: value },
-        success: function(data) {
-            $('#issue_log_table tbody').html(data);
-        }
-    });
+// Function to handle searching
+function searchTable() {
+    let searchValue = $('#search-bar').val().trim();
+    loadTableData(searchValue);
 }
 
-// Function to sort the table
+// Function to handle sorting
 function sortTable(column) {
-    const currentOrder = $('#issue_log_table').data('order') || 'asc';
-    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-
+    let currentOrder = $('#issue_log_table').data('order') || 'ASC';
+    let newOrder = currentOrder === 'ASC' ? 'DESC' : 'ASC';
     $('#issue_log_table').data('order', newOrder);
-    $('#issue_log_table').data('sort_by', column);
-
-    $.ajax({
-        url: 'part/update_status.php',
-        type: 'GET',
-        data: { sort_by: column, order: newOrder },
-        success: function(data) {
-            $('#issue_log_table tbody').html(data);
-        }
-    });
+    loadTableData('', column, newOrder);
 }
+
 </script>
