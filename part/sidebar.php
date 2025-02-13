@@ -108,6 +108,23 @@ if (!isset($_SESSION['secured'])) {
                         <!--end:Menu link-->
                     </div>
 
+                    <!--begin:Menu item-->
+                    <div  class="menu-item">
+                        <!--begin:Menu link-->
+                        <a class="menu-link" href="#" onclick="showSection(event, 'tasks', true);">
+                           <span class="menu-icon">
+                                <span class="svg-icon svg-icon-2" style="color: yellow;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <!-- Example SVG for a ticket-like icon -->
+                                        <path opacity=0.85 d="M4 2h16c.55 0 1 .45 1 1v3c-1.1 0-2 .9-2 2s.9 2 2 2v3c-1.1 0-2 .9-2 2s.9 2 2 2v3c0 .55-.45 1-1 1H4c-.55 0-1-.45-1-1v-3c1.1 0 2-.9 2-2s-.9-2-2-2V8c1.1 0 2-.9 2-2s-.9-2-2-2V3c0-.55.45-1 1-1zm15 17.5V19h-2v.5c0 .83-.67 1.5-1.5 1.5H8.5c-.83 0-1.5-.67-1.5-1.5V19H5v.5c0 .83-.67 1.5-1.5 1.5H4v-15h15v15zm-9-9H9V6h3v4.5zm1 0V6h3v4.5h-3z"/>
+                                    </svg>
+                                </span>
+                            </span>
+                            <span class="menu-title" style="color:white">Job Order Tasks</span>
+                        </a>
+                        <!--end:Menu link-->
+                    </div>
+
                     <div class="menu-item">
                         <a class="menu-link" href="#" onclick="showSection(event, 'job_order');">
                             <span class="menu-icon">
@@ -215,7 +232,7 @@ if (!isset($_SESSION['secured'])) {
         window.location.href = window.location.pathname + '?section=' + sectionId + '&analytics=' + analyticsPage + '&isLogHistory=' + isLogHistory;
 
         // Hide all sections
-        var sections = document.querySelectorAll('#dashboard, #records, #student_acc, #faculty_acc, #staff_acc, #admin_acc, #job_order, #archive, #category_section');
+        var sections = document.querySelectorAll('#dashboard, #records, #tasks, #student_acc, #faculty_acc, #staff_acc, #admin_acc, #job_order, #archive, #category_section');
         sections.forEach(function(section) {
             section.style.display = 'none';
         });

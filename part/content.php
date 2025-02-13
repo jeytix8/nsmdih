@@ -23,7 +23,9 @@ $section = isset($_GET['section']) ? $_GET['section'] : 'dashboard';  // Set def
             <?php if ($section === 'dashboard') : ?>
                 <?php include "dashboard.php"; ?>
             <?php elseif ($section === 'records') : ?>
-                <?php include "content_joborder.php"; ?>
+                <?php include "content_joborder_records.php"; ?>
+            <?php elseif ($section === 'tasks') : ?>
+                <?php include "content_joborder_tasks.php"; ?>
             <?php elseif (in_array($section, ['student_acc', 'faculty_acc', 'staff_acc', 'admin_acc'])) : ?>
                 <?php include "content_adminnewacc.php"; ?>
             <?php elseif ($section === 'job_order') : ?>
