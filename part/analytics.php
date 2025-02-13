@@ -5,12 +5,12 @@ ini_set('display_errors', 1);
 
 include('connect.php');
 
-// Fetch Job Orders Per Department
+// Fetch Job Orders Per section
 $jobOrderPerDept = [];
-$query = "SELECT department, COUNT(*) as count FROM records_job_order GROUP BY department ORDER BY department ASC";
+$query = "SELECT section, COUNT(*) as count FROM records_job_order GROUP BY section ORDER BY section ASC";
 $result = $conn->query($query);
 while ($row = $result->fetch_assoc()) {
-    $jobOrderPerDept[$row['department']] = $row['count'];
+    $jobOrderPerDept[$row['section']] = $row['count'];
 }
 
 // Fetch Job Orders by Type (job_order_nature)
@@ -23,10 +23,10 @@ while ($row = $result->fetch_assoc()) {
 
 // Fetch Satisfaction Survey Data
 $satisfactionSurvey = [];
-$query = "SELECT department, SUM(satisfied) / COUNT(*) AS avg_satisfaction FROM records_job_order GROUP BY department";
+$query = "SELECT section, SUM(satisfied) / COUNT(*) AS avg_satisfaction FROM records_job_order GROUP BY section";
 $result = $conn->query($query);
 while ($row = $result->fetch_assoc()) {
-    $satisfactionSurvey[$row['department']] = round($row['avg_satisfaction'], 2);
+    $satisfactionSurvey[$row['section']] = round($row['avg_satisfaction'], 2);
 }
 
 // JSON Encode Data for JavaScript
@@ -83,8 +83,8 @@ $satisfactionSurveyJSON = json_encode($satisfactionSurvey);
 <!-- Chart Containers -->
 <div id="chart-wrapper">
     <div class="chart-box">
-        <h3>Job Orders Per Department</h3>
-        <canvas id="jobOrderPerDepartmentChart"></canvas>
+        <h3>Job Orders Per Section</h3>
+        <canvas id="jobOrderPerSectionChart"></canvas>
     </div>
 
     <div class="chart-box">
@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Initialize Charts
-    createBarChart("jobOrderPerDepartmentChart", "Job Orders Per Department", jobOrderPerDept);
+    createBarChart("jobOrderPerSectionChart", "Job Orders Per Section", jobOrderPerDept);
     createBarChart("jobOrderTypeChart", "Type of Request", jobOrderByType);
     createBarChart("satisfactionSurveyChart", "Average Satisfaction (%)", satisfactionSurvey);
 });

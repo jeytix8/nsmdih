@@ -14,37 +14,37 @@ if (!isset($_SESSION['secured'])) {
 include('connect.php');
 include 'analytics.php';
 
-// ----------------- Fetch Data for department and PC Counts for Logs -----------------
-$querydepartments = "SELECT DISTINCT department FROM records_job_order ORDER BY department ASC";
-$resultdepartments = $conn->query($querydepartments);
-$departments = [];
-if ($resultdepartments && $resultdepartments->num_rows > 0) {
-    while ($row = $resultdepartments->fetch_assoc()) {
-        $departments[] = $row['department'];
+// ----------------- Fetch Data for section and PC Counts for Logs -----------------
+$querysections = "SELECT DISTINCT section FROM records_job_order ORDER BY section ASC";
+$resultsections = $conn->query($querysections);
+$sections = [];
+if ($resultsections && $resultsections->num_rows > 0) {
+    while ($row = $resultsections->fetch_assoc()) {
+        $sections[] = $row['section'];
     }
 }
 
-$selecteddepartment = isset($_GET['department']) ? $conn->real_escape_string($_GET['department']) : '';
+$selectedsection = isset($_GET['section']) ? $conn->real_escape_string($_GET['section']) : '';
 
-// Query to get department counts for the doughnut chart (all departments)
-$departmentCounts = [];
-$totalCountdepartments = 0;
-$querydepartmentCounts = "SELECT department, COUNT(*) as count FROM records_job_order GROUP BY department ORDER BY department ASC";
-$resultdepartmentCounts = $conn->query($querydepartmentCounts);
-if ($resultdepartmentCounts && $resultdepartmentCounts->num_rows > 0) {
-    while ($row = $resultdepartmentCounts->fetch_assoc()) {
-        $departmentCounts[$row['department']] = $row['count'];
-        $totalCountdepartments += $row['count'];
+// Query to get section counts for the doughnut chart (all sections)
+$sectionCounts = [];
+$totalCountsections = 0;
+$querysectionCounts = "SELECT section, COUNT(*) as count FROM records_job_order GROUP BY section ORDER BY section ASC";
+$resultsectionCounts = $conn->query($querysectionCounts);
+if ($resultsectionCounts && $resultsectionCounts->num_rows > 0) {
+    while ($row = $resultsectionCounts->fetch_assoc()) {
+        $sectionCounts[$row['section']] = $row['count'];
+        $totalCountsections += $row['count'];
     }
 }
 
 $pcCounts = [];
 $totalCountPCs = 0;
 
-if ($selecteddepartment) {
-    // Prepared statement to fetch PC counts for the selected department
-    $queryPCs = $conn->prepare("SELECT satisfied, COUNT(*) as count FROM records_job_order WHERE department = ? GROUP BY satisfied ORDER BY satisfied ASC");
-    $queryPCs->bind_param("s", $selecteddepartment);
+if ($selectedsection) {
+    // Prepared statement to fetch PC counts for the selected section
+    $queryPCs = $conn->prepare("SELECT satisfied, COUNT(*) as count FROM records_job_order WHERE section = ? GROUP BY satisfied ORDER BY satisfied ASC");
+    $queryPCs->bind_param("s", $selectedsection);
     $queryPCs->execute();
     $resultPCs = $queryPCs->get_result();
 
@@ -57,13 +57,13 @@ if ($selecteddepartment) {
         $pcCounts = ['No data' => 0];
     }
 } else {
-    foreach ($departmentCounts as $department => $count) {
-        $queryPCsAlldepartments = $conn->prepare("SELECT satisfied, COUNT(*) as count FROM records_job_order WHERE department = ? GROUP BY satisfied");
-        $queryPCsAlldepartments->bind_param("s", $department);
-        $queryPCsAlldepartments->execute();
-        $resultPCsAlldepartments = $queryPCsAlldepartments->get_result();
+    foreach ($sectionCounts as $section => $count) {
+        $queryPCsAllsections = $conn->prepare("SELECT satisfied, COUNT(*) as count FROM records_job_order WHERE section = ? GROUP BY satisfied");
+        $queryPCsAllsections->bind_param("s", $section);
+        $queryPCsAllsections->execute();
+        $resultPCsAllsections = $queryPCsAllsections->get_result();
 
-        while ($row = $resultPCsAlldepartments->fetch_assoc()) {
+        while ($row = $resultPCsAllsections->fetch_assoc()) {
             $pcCounts[$row['satisfied']] = isset($pcCounts[$row['satisfied']]) ? $pcCounts[$row['satisfied']] + $row['count'] : $row['count'];
             $totalCountPCs += $row['count'];
         }
@@ -71,34 +71,34 @@ if ($selecteddepartment) {
 }
 
 // ----------------- Fetch Data for Remarks and PC Counts for Issues -----------------
-$departmentquery = "SELECT DISTINCT department FROM records_job_order ORDER BY department ASC";
-$resultissuedepartment = $conn->query($departmentquery);
-$departmentissue = [];
-if ($resultissuedepartment && $resultissuedepartment->num_rows > 0) {
-    while ($row = $resultissuedepartment->fetch_assoc()) {
-        $departmentissue[] = $row['department'];
+$sectionquery = "SELECT DISTINCT section FROM records_job_order ORDER BY section ASC";
+$resultissuesection = $conn->query($sectionquery);
+$sectionissue = [];
+if ($resultissuesection && $resultissuesection->num_rows > 0) {
+    while ($row = $resultissuesection->fetch_assoc()) {
+        $sectionissue[] = $row['section'];
     }
 }
 
-$selectedissuedepartment = isset($_GET['issue_department']) ? $conn->real_escape_string($_GET['issue_department']) : '';
+$selectedissuesection = isset($_GET['issue_section']) ? $conn->real_escape_string($_GET['issue_section']) : '';
 
-$departmentcount = [];
-$totalissuecountdepartments = 0;
-$totalquerydepartmentcounts = "SELECT department, COUNT(*) as count1 FROM records_job_order GROUP BY department ORDER BY department ASC";
-$resultissuedepartmentcounts = $conn->query($totalquerydepartmentcounts);
-if ($resultissuedepartmentcounts && $resultissuedepartmentcounts->num_rows > 0) {
-    while ($row = $resultissuedepartmentcounts->fetch_assoc()) {
-        $departmentcount[$row['department']] = $row['count1'];
-        $totalissuecountdepartments += $row['count1'];
+$sectioncount = [];
+$totalissuecountsections = 0;
+$totalquerysectioncounts = "SELECT section, COUNT(*) as count1 FROM records_job_order GROUP BY section ORDER BY section ASC";
+$resultissuesectioncounts = $conn->query($totalquerysectioncounts);
+if ($resultissuesectioncounts && $resultissuesectioncounts->num_rows > 0) {
+    while ($row = $resultissuesectioncounts->fetch_assoc()) {
+        $sectioncount[$row['section']] = $row['count1'];
+        $totalissuecountsections += $row['count1'];
     }
 }
 
 $issuepccounts = [];
 $totalissuecountpcs = 0;
 
-if ($selectedissuedepartment) {
-    $queryissuePCs = $conn->prepare("SELECT satisfied, COUNT(*) as count1 FROM records_job_order WHERE department = ? GROUP BY satisfied ORDER BY satisfied ASC");
-    $queryissuePCs->bind_param("s", $selectedissuedepartment);
+if ($selectedissuesection) {
+    $queryissuePCs = $conn->prepare("SELECT satisfied, COUNT(*) as count1 FROM records_job_order WHERE section = ? GROUP BY satisfied ORDER BY satisfied ASC");
+    $queryissuePCs->bind_param("s", $selectedissuesection);
     $queryissuePCs->execute();
     $resultissuePCs = $queryissuePCs->get_result();
 
@@ -111,13 +111,13 @@ if ($selectedissuedepartment) {
         $issuepccounts = ['No data' => 0];
     }
 } else {
-    foreach ($departmentcount as $department => $count1) {
-        $issuequeryPCsAlldepartments = $conn->prepare("SELECT satisfied, COUNT(*) as count1 FROM records_job_order WHERE department = ? GROUP BY satisfied");
-        $issuequeryPCsAlldepartments->bind_param("s", $department);
-        $issuequeryPCsAlldepartments->execute();
-        $resultissuePCsAlldepartments = $issuequeryPCsAlldepartments->get_result();
+    foreach ($sectioncount as $section => $count1) {
+        $issuequeryPCsAllsections = $conn->prepare("SELECT satisfied, COUNT(*) as count1 FROM records_job_order WHERE section = ? GROUP BY satisfied");
+        $issuequeryPCsAllsections->bind_param("s", $section);
+        $issuequeryPCsAllsections->execute();
+        $resultissuePCsAllsections = $issuequeryPCsAllsections->get_result();
 
-        while ($row = $resultissuePCsAlldepartments->fetch_assoc()) {
+        while ($row = $resultissuePCsAllsections->fetch_assoc()) {
             $issuepccounts[$row['satisfied']] = isset($issuepccounts[$row['satisfied']]) ? $issuepccounts[$row['satisfied']] + $row['count1'] : $row['count1'];
             $totalissuecountpcs += $row['count1'];
         }
@@ -216,9 +216,9 @@ canvas {
     <div class="container-fluid print-area">
     <button class="button no-print" onclick="printPage()">Print This Page</button>
     
-            <!-- Doughnut Chart for Records Log (department-wise) -->
+            <!-- Doughnut Chart for Records Log (section-wise) -->
             <div style="display: flex; flex-wrap: wrap; height: auto; ">
-    <!-- First Chart: department Logs Count -->
+    <!-- First Chart: section Logs Count -->
     <div class="card card-flush mb-0 mb-xl-10" style="width: 25%; height: 100%; margin-right: 5px;">
         <div class="card-header pt-5">
             <div class="card-title d-flex flex-column">
@@ -226,25 +226,25 @@ canvas {
                     <span class="fs-2hx fw-bold text-black-900 me-2 lh-1 ls-n2"><?php echo number_format($totalCountPCs); ?></span>
                     <span class="fs-4 fw-semibold me-1 align-self-start">📝</span>
                    <form method="get">
-    <label for="department" style="font-size: 13px;">Select department:</label>
-    <select style="font-size: 13px;" name="department" id="department" onchange="this.form.submit()">
+    <label for="section" style="font-size: 13px;">Select section:</label>
+    <select style="font-size: 13px;" name="section" id="section" onchange="this.form.submit()">
         <option style="font-size: 13px;" value="">Overall</option>
-        <?php foreach ($departments as $department): ?>
-            <option style="font-size: 13px;" value="<?php echo $department; ?>" <?php echo $department == $selecteddepartment ? 'selected' : ''; ?>>
-                <?php echo $department; ?>
+        <?php foreach ($sections as $section): ?>
+            <option style="font-size: 13px;" value="<?php echo $section; ?>" <?php echo $section == $selectedsection ? 'selected' : ''; ?>>
+                <?php echo $section; ?>
             </option>
         <?php endforeach; ?>
     </select>
-    <!-- Preserve the selectedissuedepartment in the URL -->
-    <input type="hidden" name="issue_department" value="<?php echo htmlspecialchars($selectedissuedepartment); ?>">
+    <!-- Preserve the selectedissuesection in the URL -->
+    <input type="hidden" name="issue_section" value="<?php echo htmlspecialchars($selectedissuesection); ?>">
 </form>
                 </div>
-                <span class="text-black-500 pt-4 fw-semibold fs-6">Logs Count by department</span>
+                <span class="text-black-500 pt-4 fw-semibold fs-6">Logs Count by section</span>
             </div>
         </div>
         <div class="card-body pt-1 pb-0 d-flex align-items-center" style="height: 100%;">
             <div class="d-flex flex-center me-0 pt-0" style="width: 100%; height: 100%;">
-                <canvas style="width:100%; display: flex; height:200px; position: relative; " id="departmentChartLogs"></canvas>
+                <canvas style="width:100%; display: flex; height:200px; position: relative; " id="sectionChartLogs"></canvas>
             </div>
         </div>
     </div>
@@ -259,7 +259,7 @@ canvas {
                         <img width="23" height="23" src="workstation.png" alt="workstation"/>
                     </span>
                 </div>
-                <span class="text-gray-500 pt-4 fw-semibold fs-6" style="color:black !important;"><?php echo !empty($selecteddepartment) ? $selecteddepartment : "Overall"; ?> : PC Logs</span>
+                <span class="text-gray-500 pt-4 fw-semibold fs-6" style="color:black !important;"><?php echo !empty($selectedsection) ? $selectedsection : "Overall"; ?> : PC Logs</span>
             </div>
         </div>
         <div class="card-body pt-3 pb-4 d-flex align-items-center" style="height: 100%;">
@@ -269,7 +269,7 @@ canvas {
         </div>
     </div>
 
-    <!-- Third Chart: Issues Count by department -->
+    <!-- Third Chart: Issues Count by section -->
     <div class="card card-flush mb-5 mb-xl-10" style="width: 25%; height: 100%; margin-right: 5px;">
         <div class="card-header pt-5">
             <div class="card-title d-flex flex-column">
@@ -277,25 +277,25 @@ canvas {
                     <span class="fs-2hx fw-bold text-black-900 me-2 lh-1 ls-n2"><?php echo number_format($totalissuecountpcs); ?></span>
                     <span class="fs-4 fw-semibold me-1 align-self-start">⚠️</span>
                     <form method="get">
-    <label for="issue_department" style="font-size: 13px;">Select department:</label>
-    <select style="font-size: 13px;" name="issue_department" id="issue_department" onchange="this.form.submit()">
+    <label for="issue_section" style="font-size: 13px;">Select section:</label>
+    <select style="font-size: 13px;" name="issue_section" id="issue_section" onchange="this.form.submit()">
         <option style="font-size: 13px;" value="">Overall</option>
-        <?php foreach ($departmentissue as $issuedepartment): ?>
-            <option style="font-size: 13px;" value="<?php echo $issuedepartment; ?>" <?php echo $issuedepartment == $selectedissuedepartment ? 'selected' : ''; ?>>
-                <?php echo $issuedepartment; ?>
+        <?php foreach ($sectionissue as $issuesection): ?>
+            <option style="font-size: 13px;" value="<?php echo $issuesection; ?>" <?php echo $issuesection == $selectedissuesection ? 'selected' : ''; ?>>
+                <?php echo $issuesection; ?>
             </option>
         <?php endforeach; ?>
     </select>
-    <!-- Preserve the selecteddepartment in the URL -->
-    <input type="hidden" name="department" value="<?php echo htmlspecialchars($selecteddepartment); ?>">
+    <!-- Preserve the selectedsection in the URL -->
+    <input type="hidden" name="section" value="<?php echo htmlspecialchars($selectedsection); ?>">
 </form>
                 </div>
-                <span class="text-gray-500 pt-4 fw-semibold fs-6" style="color:black !important;">Issues Count by department</span>
+                <span class="text-gray-500 pt-4 fw-semibold fs-6" style="color:black !important;">Issues Count by section</span>
             </div>
         </div>
         <div class="card-body pt-1 pb-0 d-flex align-items-center" style="height: 100%;">
             <div class="d-flex flex-center me-0 pt-0" style="width: 100%; height: 100%;">
-                <canvas style="width:100%; display: flex; height:200px;   position: relative;" id="departmentChartIssues"></canvas>
+                <canvas style="width:100%; display: flex; height:200px;   position: relative;" id="sectionChartIssues"></canvas>
             </div>
         </div>
     </div>
@@ -310,7 +310,7 @@ canvas {
                         <img width="23" height="23" src="error.png" alt="error"/>
                     </span>
                 </div>
-                <span class="text-gray-500 pt-4 fw-semibold fs-6" style="color:black !important;"><?php echo !empty($selectedissuedepartment) ? $selectedissuedepartment : "Overall"; ?> : PC Logs with Issue</span>
+                <span class="text-gray-500 pt-4 fw-semibold fs-6" style="color:black !important;"><?php echo !empty($selectedissuesection) ? $selectedissuesection : "Overall"; ?> : PC Logs with Issue</span>
             </div>
         </div>
         <div class="card-body pt-3 pb-4 d-flex align-items-center" style="height: 100%;">
@@ -338,19 +338,19 @@ canvas {
 Chart.register(ChartDataLabels);
 
 // Total counts for Logs
-const totalLogCount = <?php echo array_sum($departmentCounts); ?>;
+const totalLogCount = <?php echo array_sum($sectionCounts); ?>;
 
-// Doughnut Chart for department Counts (Logs)
-const departmentCounts = <?php echo json_encode(array_values($departmentCounts)); ?>;
-const departmentLabels = <?php echo json_encode(array_keys($departmentCounts)); ?>;
+// Doughnut Chart for section Counts (Logs)
+const sectionCounts = <?php echo json_encode(array_values($sectionCounts)); ?>;
+const sectionLabels = <?php echo json_encode(array_keys($sectionCounts)); ?>;
 
-const departmentChartLogs = new Chart(document.getElementById('departmentChartLogs').getContext('2d'), {
+const sectionChartLogs = new Chart(document.getElementById('sectionChartLogs').getContext('2d'), {
     type: 'doughnut',
     data: {
-        labels: departmentLabels,
+        labels: sectionLabels,
         datasets: [{
-            label: 'department Log Counts',
-            data: departmentCounts,
+            label: 'section Log Counts',
+            data: sectionCounts,
             backgroundColor: [
                 '#4F81BD', '#76B7B2', '#E2725B', '#CCCCFF',
                 '#F1916D', '#19305C', '#AE7DAC', '#C48CB3'
@@ -394,19 +394,19 @@ const departmentChartLogs = new Chart(document.getElementById('departmentChartLo
 });
 
 // Total counts for Issues
-const totalIssueCount = <?php echo array_sum($departmentcount); ?>;
+const totalIssueCount = <?php echo array_sum($sectioncount); ?>;
 
-// Doughnut Chart for department Counts (Issues)
-const departmentCountsIssues = <?php echo json_encode(array_values($departmentcount)); ?>;
-const departmentLabelsIssues = <?php echo json_encode(array_keys($departmentcount)); ?>;
+// Doughnut Chart for section Counts (Issues)
+const sectionCountsIssues = <?php echo json_encode(array_values($sectioncount)); ?>;
+const sectionLabelsIssues = <?php echo json_encode(array_keys($sectioncount)); ?>;
 
-const departmentChartIssues = new Chart(document.getElementById('departmentChartIssues').getContext('2d'), {
+const sectionChartIssues = new Chart(document.getElementById('sectionChartIssues').getContext('2d'), {
     type: 'doughnut',
     data: {
-        labels: departmentLabelsIssues,
+        labels: sectionLabelsIssues,
         datasets: [{
-            label: 'department Issue Counts',
-            data: departmentCountsIssues,
+            label: 'section Issue Counts',
+            data: sectionCountsIssues,
             backgroundColor: [
                 '#f6d55c', '#ff6b35', '#2a9d8f', '#FFEB99',
                 '#C0C5CE', '#F0EAD6', '#FFDBAC'
