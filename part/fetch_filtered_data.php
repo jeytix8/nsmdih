@@ -1,15 +1,15 @@
 <?php
 include('../connect.php');
 
-$departments = isset($_POST['departments']) ? $_POST['departments'] : [];
+$sections = isset($_POST['sections']) ? $_POST['sections'] : [];
 $natures = isset($_POST['natures']) ? $_POST['natures'] : [];
 
 $query = "SELECT * FROM records_job_order WHERE 1"; // Base query
 
-// Add Department filter if selected
-if (!empty($departments)) {
-    $deptPlaceholders = implode("','", $departments);
-    $query .= " AND department IN ('$deptPlaceholders')";
+// Add section filter if selected
+if (!empty($sections)) {
+    $sectPlaceholders = implode("','", $sections);
+    $query .= " AND section IN ('$sectPlaceholders')";
 }
 
 // Add Job Order Nature filter if selected
@@ -27,7 +27,7 @@ if ($result->num_rows > 0) {
                 <td>{$row['id']}</td>
                 <td>{$row['issue_year']}-{$row['issue_month']}-{$row['issue_day']} {$row['issue_time']}</td>
                 <td>{$row['name']}</td>
-                <td>{$row['department']}</td>
+                <td>{$row['section']}</td>
                 <td>{$row['job_order_nature']}</td>
                 <td>{$row['description']}</td>
                 <td>{$row['satisfied']}</td>

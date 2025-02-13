@@ -7,76 +7,9 @@ if (!isset($_SESSION['secured'])) {
     header('Location: login.php');
     exit();
 }
-include('connect.php');
-// Fetch Departments
-$departments = [];
-$deptQuery = "SELECT DISTINCT department FROM records_job_order ORDER BY department ASC";
-$deptResult = $conn->query($deptQuery);
-while ($row = $deptResult->fetch_assoc()) {
-    $departments[] = $row['department'];
-}
-
-// Fetch Job Order Natures
-$jobOrderNatures = [];
-$natureQuery = "SELECT DISTINCT job_order_nature FROM records_job_order ORDER BY job_order_nature ASC";
-$natureResult = $conn->query($natureQuery);
-while ($row = $natureResult->fetch_assoc()) {
-    $jobOrderNatures[] = $row['job_order_nature'];
-}
-
 ?>
 
 <style>
-    /* Dropdown container */
-    #filter-dropdown {
-        display: none;
-        position: absolute;
-        background: white;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        z-index: 10;
-        width: 450px; /* Adjust width to fit two columns */
-        right: 0; /* Align to the right of the button */
-        top: 0; /* Align with the button */
-        transform: translateX(101%); /* Move it to the right */
-    }
-
-    /* Grid layout for two columns */
-    .filter-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr); /* Two columns */
-        gap: 20px; /* Space between columns */
-    }
-
-    /* Style for each filter section */
-    .filter-box {
-        padding: 10px;
-        background: #f9f9f9;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .filter-title {
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-
-    /* Checkbox label styling */
-    .filter-box label {
-        display: block;
-        font-size: 14px;
-        cursor: pointer;
-        margin: 3px 0;
-    }
-
-    /* Scrollable filter content if too many items */
-    .filter-content {
-        max-height: 200px;
-        overflow-y: auto;
-        padding-right: 5px;
-    }
-
     .issue-log-table {
         width: 100%;
         border-collapse: collapse;
@@ -99,8 +32,84 @@ while ($row = $natureResult->fetch_assoc()) {
     .issue-log-table tr:hover {
         background-color: #f1f1f1;
     }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+        padding-top: 60px;
+    }
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .confirm-button {
+        background-color: #006735; 
+        color: white;             
+        border: none;              
+        padding: 7px 7px;       
+        text-align: center;        
+        text-decoration: none;     
+        display: inline-block;     
+        margin: 4px 2px;         
+        cursor: pointer;          
+        border-radius: 5px;    
+    }
+    .confirm-button:hover {
+        background-color: #45a049; 
+    }
+    .selects {
+        border: solid black;
+        padding: 5px 5px;
+        border-radius: 5px;
+    }
 
-    .button-container2 {
+    #cancelUpdate{
+        background-color: white !important;
+        color: black;
+         padding: 7px 7px;       
+        text-align: center;        
+        text-decoration: none;     
+        display: inline-block;     
+        margin: 4px 2px;         
+        cursor: pointer;          
+        border-radius: 5px;    
+        border: solid gray 1px;
+
+    }
+    #status-filter{
+        background-color: white;
+        color: black;
+        padding: 5px;
+        text-align: center;
+        width: 150px;
+    }
+    #status-filter option{
+        background-color: white;
+        color: black;
+    }
+
+     .button-container2 {
         display: flex;
         justify-content: space-between;
         margin: 20px;
@@ -122,11 +131,11 @@ while ($row = $natureResult->fetch_assoc()) {
         border-radius: 7px;
         height: 40px;
     }
-    @media print {
-        .no-print {
-            display: none;
-        }
-    }
+     @media print {
+                .no-print {
+                    display: none;
+                }
+            }
 /* Initially hide the dropdown */
 
 
@@ -214,228 +223,125 @@ while ($row = $natureResult->fetch_assoc()) {
     <div class="button-container2">
         <!-- Filter and Search Section -->
         <div class="filter-search-container">
+            <!-- Filtering Dropdown with Clickable Button -->
             <div class="search-bar-container">
                 <input type="text" id="search-bar" placeholder="Search" onkeyup="searchTable()">
             </div>
-
             <div class="dropdown2">
-                <!-- Filter Button -->
-                <button class="dropdown2-btn" onclick="toggleFilterDropdown()">
+                <button class="dropdown2-btn">
                     <i style="color: black;" class="bi bi-funnel-fill"></i>
                 </button>
-
-                <!-- Filter options (Hidden Initially) -->
-                <div id="filter-dropdown">
-                    <div class="filter-container">
-                        <!-- Department Filters -->
-                        <div class="filter-box">
-                            <div class="filter-title">Filter by Department</div>
-                            <div class="filter-content">
-                                <?php foreach ($departments as $dept): ?>
-                                    <label>
-                                        <input type="checkbox" class="filter-checkbox" name="department" value="<?= $dept; ?>">
-                                        <?= $dept; ?>
-                                    </label>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-
-                        <!-- Job Order Nature Filters -->
-                        <div class="filter-box">
-                            <div class="filter-title">Filter by Nature of Job Order</div>
-                            <div class="filter-content">
-                                <?php foreach ($jobOrderNatures as $nature): ?>
-                                    <label>
-                                        <input type="checkbox" class="filter-checkbox" name="job_order_nature" value="<?= $nature; ?>">
-                                        <?= $nature; ?>
-                                    </label>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    </div>
+                <div class="dropdown2-content">
+                    <select id="status-filter" onchange="applyFilter()">
+                        <option value="All">All</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Ongoing">Ongoing</option>
+                        <option value="Not Resolved">Not Resolved</option>
+                    </select>
                 </div>
             </div>
 
+            <!-- Search bar -->
+            
         </div>
+
         <!-- Print button -->
         <button class="button" onclick="printPage()">Print This Page</button>
     </div>
 </div>
 
-<!-- Table -->
-<table class='issue-log-table' id='issue_log_table'>
-    <thead>
-        <tr>
-            <th onclick="sortTable11('id')">ID <i class='fas fa-sort'></i></th>
-            <th onclick="sortTable11('issue_timestamp')">Timestamp <i class='fas fa-sort'></i></th>
-            <th onclick="sortTable11('name')">Name <i class='fas fa-sort'></i></th>
-            <th onclick="sortTable11('department')">Department <i class='fas fa-sort'></i></th>
-            <th onclick="sortTable11('job_order_nature')">Nature of Job Order <i class='fas fa-sort'></i></th>
-            <th onclick="sortTable11('description')">Description <i class='fas fa-sort'></i></th>
-            <th onclick="sortTable11('satisfied')">Satisfied <i class='fas fa-sort'></i></th>
-            <th onclick="sortTable11('unsatisfied')">Unsatisfied <i class='fas fa-sort'></i></th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Data will be loaded here dynamically -->
-    </tbody>
-</table>
+
+
+
+
+
+<!-- Modal Structure -->
+<div id="statusModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <h5>Confirm Status Update</h5>
+        <p id="modalMessage"></p>
+        <label for="remarksInput">Remarks</label>
+        <textarea id="remarksInput" placeholder="Enter remarks here..." required></textarea>
+        <br>
+        <button id="confirmUpdate" class="confirm-button">Confirm</button>
+        <button id="cancelUpdate" class="confirm-button">Cancel</button>
+    </div>
+</div>
+
+
+    <table class='issue-log-table' id='issue_log_table'>
+        <thead>
+            <tr>
+                <th onclick="sortTable('id')">ID <i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('issue_date')">Timestamp <i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('name')">Name <i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('section')">Section <i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('job_order_nature')">Nature of Job Order <i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('description')">Description <i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('assign_to')">Assign To <i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('status')">Status <i class='fas fa-sort'></i></th> <!-- Now plain text -->
+                <th onclick="sortTable('satisfied')">Satisfied <i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('unsatisfied')">Unsatisfied <i class='fas fa-sort'></i></th>
+            </tr>
+        </thead>
+        <tbody>
+         
+            <?php
+          
+            ?>
+        </tbody>
+    </table>
+</div>
 
 <script>
-// Function to get current time in Manila
-function getCurrentManilaTime() {
-    const options = {
-        timeZone: 'Asia/Manila',
-        year: 'numeric',
-        month: 'long', 
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false 
-    };
+$(document).ready(function() {
+    loadTableData();
 
-    const formatter = new Intl.DateTimeFormat('en-US', options);
-    const dateParts = formatter.formatToParts(new Date());
-    
-    // Extract the parts we want
-    const year = dateParts.find(part => part.type === 'year').value;
-    const month = dateParts.find(part => part.type === 'month').value; 
-    const day = dateParts.find(part => part.type === 'day').value;
-    const hour = dateParts.find(part => part.type === 'hour').value;
-    const minute = dateParts.find(part => part.type === 'minute').value;
-    const second = dateParts.find(part => part.type === 'second').value;
-    
-    return `${day} ${month} ${year}  ${hour}:${minute}:${second}`;
-}
-
-// Function to load table data with optional filter and sort
-function loadTableData() {
-    if ($('#issue_log_table').length) { 
-        $.ajax({
-            url: 'part/fetch_jo.php',
-            type: 'GET',
-            success: function(data) {
-                $('#issue_log_table tbody').html(data);
-            },
-            error: function(xhr, status, error) {
-                console.error('Error loading table:', error);
-                alert('Failed to load data.');
-            }
-        });
-    }
-}
-
-$(document).ready(function () {
-    // Function to toggle the filter dropdown
-    window.toggleFilterDropdown = function () {
-        $("#filter-dropdown").toggle();
-    };
-
-    // Hide dropdown when clicking outside
-    $(document).click(function (event) {
-        if (!$(event.target).closest(".dropdown2").length) {
-            $("#filter-dropdown").hide();
-        }
+    $('#status-filter').change(function() {
+        filterValue = $(this).val();
+        filterData('status', filterValue);
     });
-
-    // Fetch filtered data dynamically
-    function fetchFilteredData() {
-        let selectedDepartments = [];
-        let selectedNatures = [];
-
-        // Get checked departments
-        $("input[name='department']:checked").each(function () {
-            selectedDepartments.push($(this).val());
-        });
-
-        // Get checked job order natures
-        $("input[name='job_order_nature']:checked").each(function () {
-            selectedNatures.push($(this).val());
-        });
-
-        // AJAX request to update table data
-        $.ajax({
-            url: "part/fetch_filtered_data.php",
-            type: "POST",
-            data: { departments: selectedDepartments, natures: selectedNatures },
-            success: function (response) {
-                $("#issue_log_table tbody").html(response);
-            },
-            error: function (xhr, status, error) {
-                console.error("AJAX Error: ", error);
-            }
-        });
-    }
-
-    // Attach event listener to checkboxes
-    $(".filter-checkbox").on("change", function () {
-        fetchFilteredData();
-    });
-
-    // Initial fetch when the page loads
-    fetchFilteredData();
 });
 
-// Function to sort the table data by column after applying filter
-function sortTable11(column) {
-    let table = document.getElementById("issue_log_table");
-    let currentOrder = table.dataset.order || "asc"; // Default sorting order
-    let newOrder = currentOrder === "asc" ? "desc" : "asc"; // Toggle order
-
-    // Store the new sorting order
-    table.dataset.order = newOrder;
-
-    // Fetch sorted data
+// Function to load table data
+function loadTableData() {
     $.ajax({
-        url: "part/fetch_jo.php",
-        type: "GET",
-        data: {
-            sort_by: column,
-            order: newOrder
-        },
-        success: function (data) {
-            $("#issue_log_table tbody").html(data);
-        },
-        error: function (xhr, status, error) {
-            console.error("Error loading sorted data:", error);
+        url: 'part/update_status.php',
+        type: 'GET',
+        success: function(data) {
+            $('#issue_log_table tbody').html(data);
         }
     });
 }
 
- function printPage() {
-    window.print();
+// Function to filter data
+function filterData(column, value) {
+    $.ajax({
+        url: 'part/update_status.php',
+        type: 'GET',
+        data: { filter_by: column, filter_value: value },
+        success: function(data) {
+            $('#issue_log_table tbody').html(data);
+        }
+    });
 }
 
-// Function to search through the table columns (case-insensitive and partial match)
-function searchTable() {
-    const input = document.getElementById("search-bar");          // Get the search input
-    const filter = input.value.trim().toLowerCase();              // Trim spaces and convert to lowercase
-    const table = document.getElementById("issue_log_table");      // Get the table
-    const rows = table.getElementsByTagName("tr");                 // Get all rows in the table
+// Function to sort the table
+function sortTable(column) {
+    const currentOrder = $('#issue_log_table').data('order') || 'asc';
+    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
 
-    // Loop through all table rows (skip the header row, which is at index 0)
-    for (let i = 1; i < rows.length; i++) {
-        const cells = rows[i].getElementsByTagName("td");          // Get all cells in the current row
-        let matchFound = false;
+    $('#issue_log_table').data('order', newOrder);
+    $('#issue_log_table').data('sort_by', column);
 
-        // Loop through each cell in the row and check if it contains the search term
-        for (let j = 0; j < cells.length; j++) {
-            const cell = cells[j];
-            // Trim cell content and compare it with the search term
-            if (cell && cell.innerText.trim().toLowerCase().includes(filter)) {
-                matchFound = true;  // If any cell contains the search term, mark as found
-                break;               // Stop checking other cells if one match is found
-            }
+    $.ajax({
+        url: 'part/update_status.php',
+        type: 'GET',
+        data: { sort_by: column, order: newOrder },
+        success: function(data) {
+            $('#issue_log_table tbody').html(data);
         }
-
-        // If a match is found, show the row; otherwise, hide it
-        if (matchFound) {
-            rows[i].style.display = "";  // Show row
-        } else {
-            rows[i].style.display = "none";  // Hide row
-        }
-    }
+    });
 }
-
 </script>
