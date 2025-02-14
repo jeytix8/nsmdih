@@ -320,7 +320,7 @@ $(document).ready(function () {
         if (newStatus === "Resolved" || newStatus === "On Hold") {
             // Fetch existing data before showing modal
             $.ajax({
-                url: "part/fetch_joborder_details.php", // New PHP file to fetch details
+                url: "part/fetch_joborder_adminremarks.php", // New PHP file to fetch details
                 type: "POST",
                 data: { id: id },
                 dataType: "json",

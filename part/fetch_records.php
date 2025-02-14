@@ -72,7 +72,6 @@ $sql = "SELECT id,
             timestamp_received, computer_name, model, ip_address, operating_system, remarks, 
             timestamp_remarks, satisfied, unsatisfied
         FROM records_job_order
-        WHERE assign_to IS NOT NULL AND assign_to != ''  
         ORDER BY $sort_by $order";
 
 

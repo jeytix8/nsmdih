@@ -32,6 +32,8 @@ $section = isset($_GET['section']) ? $_GET['section'] : 'dashboard';  // Set def
                 <?php include "content_adminnewacc.php"; ?>
             <?php elseif ($section === 'job_order') : ?>
                 <?php include "form_joborder.php"; ?>
+            <?php elseif ($section === 'job_order_status') : ?>
+                <?php include "status_joborder.php"; ?>
             <?php elseif ($section === 'category_section') : ?>
                 <?php include "content_category.php"; ?>
             <?php elseif ($section === 'archive') : ?>
