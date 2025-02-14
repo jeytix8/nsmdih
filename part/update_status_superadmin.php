@@ -52,8 +52,9 @@ $sql = "
         description,
         assign_to,
         status,
-        satisfied,
-        unsatisfied
+        timestamp_received,
+        remarks,
+        timestamp_remarks
     FROM records_job_order
     WHERE name LIKE '%$search%' 
        OR section LIKE '%$search%' 
@@ -89,8 +90,9 @@ if ($result->num_rows > 0) {
         echo "</select>
             </td>
             <td class='status-column' data-id='" . $row["id"] . "'>" . htmlspecialchars($row["status"]) . "</td>
-            <td>" . htmlspecialchars($row["satisfied"]) . "</td>
-            <td>" . htmlspecialchars($row["unsatisfied"]) . "</td>
+            <td>" . htmlspecialchars($row["timestamp_received"]) . "</td>
+            <td>" . htmlspecialchars($row["remarks"]) . "</td>
+            <td>" . htmlspecialchars($row["timestamp_remarks"]) . "</td>
         </tr>";
     }
 } else {

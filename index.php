@@ -32,7 +32,7 @@ if (!isset($_SESSION['secured'])) {
 		<title>NSMDIH Job Order</title>
 		<script type="text/javascript" src="assets/media/jquery.js"></script>
 		<link rel="canonical" href="https://preview.keenthemes.com/metronic8" />
-		<link rel="shortcut icon" href="logo.png" />
+		<link rel="shortcut icon" href="sinai_logo.png" />
 
 	
 		<link href="assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />

@@ -269,9 +269,7 @@ if (!isset($_SESSION['secured'])) {
                 <th onclick="sortTable('ip_address')">IP Address<i class='fas fa-sort'></i></th>
                 <th onclick="sortTable('operating_system')">Operating System<i class='fas fa-sort'></i></th>
                 <th onclick="sortTable('remarks')">Remarks<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('timestamp_resolved')">Timestamp Resolved<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('satisfied')">Satisfied<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('unsatisfied')">Unsatisfied<i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('timestamp_remarks')">Timestamp Remarks<i class='fas fa-sort'></i></th>
             </tr>
         </thead>
         <tbody>
@@ -306,56 +304,76 @@ if (!isset($_SESSION['secured'])) {
 </div>
 
 <script>
-$(document).ready(function() {
+$(document).ready(function () {
     loadTableData();
 
     // Store previous status before change
-    $(document).on('focus', '.status-dropdown', function() {
-        $(this).data('previous', $(this).val()); // Store the previous value
+    $(document).on("focus", ".status-dropdown", function () {
+        $(this).data("previous", $(this).val()); // Store the previous value
     });
 
-    $(document).on('change', '.status-dropdown', function() {
-        let id = $(this).data('id');
+    $(document).on("change", ".status-dropdown", function () {
+        let id = $(this).data("id");
         let newStatus = $(this).val();
-        let previousStatus = $(this).data('previous'); // Get the stored previous value
+        let previousStatus = $(this).data("previous"); // Get the stored previous value
 
-        if (newStatus === "Resolved") {
-            // Show modal before updating status
-            $('#resolvedModal').show();
+        if (newStatus === "Resolved" || newStatus === "On Hold") {
+            // Fetch existing data before showing modal
+            $.ajax({
+                url: "part/fetch_joborder_details.php", // New PHP file to fetch details
+                type: "POST",
+                data: { id: id },
+                dataType: "json",
+                success: function (data) {
+                    if (data.success) {
+                        $("#computer_name").val(data.computer_name || "");
+                        $("#model").val(data.model || "");
+                        $("#ip_address").val(data.ip_address || "");
+                        $("#operating_system").val(data.operating_system || "");
+                        $("#remarks").val(data.remarks || "");
+                    } else {
+                        alert("Failed to fetch details!");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("AJAX error:", error);
+                },
+            });
 
-            // Ensure old values are cleared
-            $('#computer_name, #model, #ip_address, #operating_system, #remarks').val('');
+            // Show modal
+            $("#resolvedModal").show();
 
             // Handle confirm button click
-            $('#confirmResolve').off('click').on('click', function() {
-                let computer_name = $('#computer_name').val().trim();
-                let model = $('#model').val().trim();
-                let ip_address = $('#ip_address').val().trim();
-                let operating_system = $('#operating_system').val().trim();
-                let remarks = $('#remarks').val().trim();
+            $("#confirmResolve").off("click").on("click", function () {
+                let computer_name = $("#computer_name").val().trim();
+                let model = $("#model").val().trim();
+                let ip_address = $("#ip_address").val().trim();
+                let operating_system = $("#operating_system").val().trim();
+                let remarks = $("#remarks").val().trim();
 
-                if (!computer_name || !model || !ip_address || !operating_system || !remarks) {
-                    alert('All fields are required!');
+                if (!remarks) {
+                    alert("Remarks field is required!");
                     return;
                 }
 
                 // Proceed with updating status
                 updateStatus(id, newStatus, computer_name, model, ip_address, operating_system, remarks);
-                $('#resolvedModal').hide();
+                $("#resolvedModal").hide();
             });
 
             // Handle cancel button click
-            $('#cancelResolve, #closeModal').off('click').on('click', function() {
-                $('#resolvedModal').hide();
+            $("#cancelResolve, #closeModal").off("click").on("click", function () {
+                $("#resolvedModal").hide();
                 $(`.status-dropdown[data-id='${id}']`).val(previousStatus); // Revert to previous status
             });
 
         } else {
-            // Directly update status if not "Resolved"
+            // Directly update status if not "Resolved" or "On Hold"
             updateStatus(id, newStatus);
         }
     });
 });
+
 
 function updateStatus(id, newStatus, computer_name = '', model = '', ip_address = '', operating_system = '', remarks = '') {
     $.ajax({

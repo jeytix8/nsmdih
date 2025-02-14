@@ -137,88 +137,88 @@ if (!isset($_SESSION['secured'])) {
                 }
             }
 
-    .assign-to-dropdown {
-        height: 30px;
-    }
+.assign-to-dropdown {
+    height: 30px;
+}
 
-    .button-container2 {
-        display: flex;
-        align-items: center;
-        justify-content: space-between; 
-        margin: 20px;
-    }
+.button-container2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    margin: 20px;
+}
 
-    .filter-search-container {
-        display: flex;
-        align-items: center;
-        gap: 15px; /* Minimal space between the filter icon and search bar */
-    }
+.filter-search-container {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Minimal space between the filter icon and search bar */
+}
 
-    .search-bar-container input {
-        padding: 5px;
-        font-size: 14px;
-        width: 200px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
+.search-bar-container input {
+    padding: 5px;
+    font-size: 14px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
 
-    .dropdown2 {
-        position: relative; /* Needed for dropdown positioning */
-        display: flex;
-        align-items: center;
-    }
+.dropdown2 {
+    position: relative; /* Needed for dropdown positioning */
+    display: flex;
+    align-items: center;
+}
 
-    .dropdown2-btn {
-        background-color: white;
-        border: 1px solid white;
-        border-radius: 4px;
-        padding: 5px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 38px; /* Matches the height of the search bar */
-        width: 45px; /* Square button for the icon */
-    }
+.dropdown2-btn {
+    background-color: white;
+    border: 1px solid white;
+    border-radius: 4px;
+    padding: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px; /* Matches the height of the search bar */
+    width: 45px; /* Square button for the icon */
+}
 
-    .dropdown2-content {
-        position: absolute;
-        top: 101%; /* Dropdown below the button */
-        left: 0;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        padding: 5px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
-        display: none; /* Initially hidden */
-        z-index: 10;
-        border-radius: 4px;
-    }
+.dropdown2-content {
+    position: absolute;
+    top: 101%; /* Dropdown below the button */
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 5px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
+    display: none; /* Initially hidden */
+    z-index: 10;
+    border-radius: 4px;
+}
 
-    .dropdown2:hover .dropdown2-content {
-        display: block; /* Show dropdown on hover */
-    }
+.dropdown2:hover .dropdown2-content {
+    display: block; /* Show dropdown on hover */
+}
 
-    .dropdown2-content select {
-        width: 150px;
-        padding: 5px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
-    }
+.dropdown2-content select {
+    width: 150px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
 
-    .button {
-        background-color: #007bff;
-        color: white;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
+.button {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
 
-    .button:hover {
-        background-color: #0056b3;
-    }
+.button:hover {
+    background-color: #0056b3;
+}
 </style>
 
     <div id="issue_ticket">
@@ -242,9 +242,6 @@ if (!isset($_SESSION['secured'])) {
                         </select>
                     </div>
                 </div>
-
-                <!-- Search bar -->
-                
             </div>
 
             <!-- Print button -->
@@ -255,58 +252,85 @@ if (!isset($_SESSION['secured'])) {
     <table class='issue-log-table' id='issue_log_table'>
         <thead>
             <tr>
-                <th onclick="sortTable('id')">ID<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('issue_date')">Timestamp<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('name')">Name<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('section')">Section<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('job_order_nature')">Nature of Job Order<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('description')">Description<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('assign_to')">Assign To<i class='fas fa-sort'></i></th> <!-- Dropdown -->
-                <th onclick="sortTable('status')">Status<i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('id')">ID <i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('issue_date')">Timestamp <i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('name')">Name <i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('section')">Section <i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('job_order_nature')">Nature of Job Order <i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('description')">Description <i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('assign_to')">Assign To <i class='fas fa-sort'></i></th> <!-- Dropdown -->
+                <th onclick="sortTable('status')">Status <i class='fas fa-sort'></i></th>
                 <th onclick="sortTable('timestamp_received')">Timestamp Received<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('computer_name')">Computer Name<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('model')">Model<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('ip_address')">IP Address<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('operating_system')">Operating System<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('remarks')">Remarks<i class='fas fa-sort'></i></th>
+                <th onclick="sortTable('remarks')">Remarks <i class='fas fa-sort'></i></th>
                 <th onclick="sortTable('timestamp_remarks')">Timestamp Remarks<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('satisfied')">Satisfied<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('unsatisfied')">Unsatisfied<i class='fas fa-sort'></i></th>
             </tr>
         </thead>
         <tbody>
-            <!-- Data will be loaded dynamically from update_status_admin.php -->
+            <!-- Data will be loaded dynamically from update_status_superadmin.php -->
         </tbody>
     </table>
 
+</div>
+
 <script>
 $(document).ready(function() {
-    loadTableData(); // Load data on page load
+    loadTableData();
+
+    // Update "Assign To" and "Status" when dropdown is changed
+    $(document).on('change', '.assign-to-dropdown', function() {
+        let id = $(this).data('id');
+        let assignTo = $(this).val();
+        updateAssignment(id, assignTo);
+    });
+
+    // Apply filter when the status dropdown is changed
+    $('#status-filter').change(function() {
+        let filterValue = $(this).val();
+        loadTableData(filterValue);
+    });
 });
 
-// Function to load table data (fetch only, no updates)
-function loadTableData() {
-    $.get('part/fetch_records.php', function(data) {
-        $('#issue_log_table tbody').html(data);
+// Function to update assignment & status via AJAX
+function updateAssignment(id, assignTo) {
+    $.ajax({
+        url: 'part/update_status_superadmin.php',
+        type: 'POST',
+        data: { id: id, assign_to: assignTo },
+        dataType: 'json',
+        success: function(response) {
+            alert(response.message);
+            $(`.status-column[data-id='${id}']`).text(response.status);
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX error:', error);
+        }
     });
 }
 
-// Function to sort the table
-function sortTable(column) {
-    const currentOrder = $('#issue_log_table').data('order') || 'asc';
-    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-
-    $('#issue_log_table').data('order', newOrder);
-    $('#issue_log_table').data('sort_by', column);
-
+// Function to load table data with sorting, searching, and filtering
+function loadTableData(search = '', sort_by = 'id', order = 'DESC') {
     $.ajax({
-        url: 'part/fetch_records.php', // Fetch-only script
+        url: 'part/update_status_superadmin.php',
         type: 'GET',
-        data: { sort_by: column, order: newOrder },
+        data: { search: search, sort_by: sort_by, order: order },
         success: function(data) {
             $('#issue_log_table tbody').html(data);
         }
     });
+}
+
+// Function to handle searching
+function searchTable() {
+    let searchValue = $('#search-bar').val().trim();
+    loadTableData(searchValue);
+}
+
+// Function to handle sorting
+function sortTable(column) {
+    let currentOrder = $('#issue_log_table').data('order') || 'ASC';
+    let newOrder = currentOrder === 'ASC' ? 'DESC' : 'ASC';
+    $('#issue_log_table').data('order', newOrder);
+    loadTableData('', column, newOrder);
 }
 
 </script>
