@@ -153,6 +153,7 @@ if (!isset($_SESSION['secured'])) {
                     </div>
                     <!--end:Menu item-->
 
+                    <!--begin:Menu item-->
                     <div class="menu-item">
                         <a class="menu-link" href="#" onclick="showSection(event, 'job_order');">
                             <span class="menu-icon">
@@ -171,6 +172,26 @@ if (!isset($_SESSION['secured'])) {
                         </a>
                     </div>
 					<!--end:Menu item-->
+
+                    <!--begin:Menu item-->
+                    <div class="menu-item">
+                        <a class="menu-link" href="#" onclick="showSection(event, 'job_order_status');">
+                            <span class="menu-icon">
+                                <span class="svg-icon svg-icon-2" style="color: yellow;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                                         <g id="duotune">
+                                            <!-- Document background -->
+                                            <path opacity="0.6" d="M4 2h12l4 4v14c0 .55-.45 1-1 1H4c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1zM16 7h4l-4-4v4z" />
+                                            <!-- Plus mark for submission -->
+                                            <path d="M12 9c.55 0 1 .45 1 1v2h2c.55 0 1 .45 1 1s-.45 1-1 1h-2v2c0 .55-.45 1-1 1s-1-.45-1-1v-2H9c-.55 0-1-.45-1-1s.45-1 1-1h2V10c0-.55.45-1 1-1z" />
+                                        </g>
+                                    </svg>
+                                </span>
+                            </span>
+                            <span class="menu-title" style="color:white">Job Order Status</span>
+                        </a>
+                    </div>
+                    <!--end:Menu item-->
 
 					<!--begin:Menu item-->
 					<div class="menu-item pt-5">
@@ -260,7 +281,7 @@ if (!isset($_SESSION['secured'])) {
         window.location.href = window.location.pathname + '?section=' + sectionId + '&analytics=' + analyticsPage + '&isLogHistory=' + isLogHistory;
 
         // Hide all sections
-        var sections = document.querySelectorAll('#dashboard, #request, #assignment, #records, #student_acc, #faculty_acc, #staff_acc, #admin_acc, #job_order, #archive, #category_section');
+        var sections = document.querySelectorAll('#dashboard, #request, #assignment, #records, #student_acc, #faculty_acc, #staff_acc, #admin_acc, #job_order, #job_order_status, #archive, #category_section');
         sections.forEach(function(section) {
             section.style.display = 'none';
         });
