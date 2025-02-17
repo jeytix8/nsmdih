@@ -56,11 +56,21 @@ $sql = "
         remarks,
         timestamp_remarks
     FROM records_job_order
-    WHERE name LIKE '%$search%' 
-       OR section LIKE '%$search%' 
-       OR job_order_nature LIKE '%$search%' 
-       OR status LIKE '%$search%'
-       OR assign_to LIKE '%$search%'  -- ✅ Include search by assigned employee
+    WHERE 
+        id LIKE '%$search%' 
+        OR issue_year LIKE '%$search%'
+        OR issue_month LIKE '%$search%'
+        OR issue_day LIKE '%$search%'
+        OR issue_time LIKE '%$search%'
+        OR name LIKE '%$search%'
+        OR section LIKE '%$search%'
+        OR job_order_nature LIKE '%$search%'
+        OR description LIKE '%$search%'
+        OR assign_to LIKE '%$search%'
+        OR status LIKE '%$search%'
+        OR timestamp_received LIKE '%$search%'
+        OR remarks LIKE '%$search%'
+        OR timestamp_remarks LIKE '%$search%'
     ORDER BY $sort_by $order";
 
 $result = $conn->query($sql);

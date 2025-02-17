@@ -52,17 +52,6 @@ if (!isset($_SESSION['secured'])) {
         border: solid gray 1px;
 
     }
-    #status-filter{
-        background-color: white;
-        color: black;
-        padding: 5px;
-        text-align: center;
-        width: 150px;
-    }
-    #status-filter option{
-        background-color: white;
-        color: black;
-    }
 
      .button-container2 {
         display: flex;
@@ -72,14 +61,6 @@ if (!isset($_SESSION['secured'])) {
     }
      .button-container2 .button{
         padding:5px 20px;
-        color: white;
-        background-color:#006735 ;
-        border: solid;
-        border-radius: 7px;
-        height: 40px;
-    }
-    .dropdown2-btn{
-         padding:5px 20px;
         color: white;
         background-color:#006735 ;
         border: solid;
@@ -116,50 +97,6 @@ if (!isset($_SESSION['secured'])) {
         border: 1px solid #ccc;
         border-radius: 4px;
         box-sizing: border-box;
-    }
-
-    .dropdown2 {
-        position: relative; /* Needed for dropdown positioning */
-        display: flex;
-        align-items: center;
-    }
-
-    .dropdown2-btn {
-        background-color: white;
-        border: 1px solid white;
-        border-radius: 4px;
-        padding: 5px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 38px; /* Matches the height of the search bar */
-        width: 45px; /* Square button for the icon */
-    }
-
-    .dropdown2-content {
-        position: absolute;
-        top: 101%; /* Dropdown below the button */
-        left: 0;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        padding: 5px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
-        display: none; /* Initially hidden */
-        z-index: 10;
-        border-radius: 4px;
-    }
-
-    .dropdown2:hover .dropdown2-content {
-        display: block; /* Show dropdown on hover */
-    }
-
-    .dropdown2-content select {
-        width: 150px;
-        padding: 5px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
     }
 
     .button {
@@ -265,22 +202,6 @@ if (!isset($_SESSION['secured'])) {
                 <div class="search-bar-container">
                     <input type="text" id="search-bar" placeholder="Search" onkeyup="searchTable()">
                 </div>
-                <div class="dropdown2">
-                    <button class="dropdown2-btn">
-                        <i style="color: black;" class="bi bi-funnel-fill"></i>
-                    </button>
-                    <div class="dropdown2-content">
-                        <select id="status-filter" onchange="applyFilter()">
-                            <option value="All">All</option>
-                            <option value="Resolved">Resolved</option>
-                            <option value="Ongoing">Ongoing</option>
-                            <option value="Not Resolved">Not Resolved</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Search bar -->
-                
             </div>
 
             <!-- Print button -->
@@ -479,4 +400,76 @@ function sortTable(column) {
     });
 }
 
+// Function to handle searching
+function searchTable() {
+    let searchValue = $('#search-bar').val().trim();
+    
+    // If search input is empty, reset the table to its default state
+    if (searchValue === "") {
+        // Call the same PHP script but without any search query parameter
+        $.ajax({
+            url: 'part/status_joborder_fetch_rate.php',
+            type: 'GET',
+            success: function(data) {
+                if (data.success) {
+                    let tableRows = '';
+                    data.data.forEach(row => {
+                        tableRows += `
+                            <tr>
+                                <td>${row.id}</td>
+                                <td>${row.issue_date}</td>
+                                <td>${row.name}</td>
+                                <td>${row.section}</td>
+                                <td>${row.job_order_nature}</td>
+                                <td>${row.description}</td>
+                                <td>${row.assign_to}</td>
+                                <td>${row.status}</td>
+                                <td>${row.button}</td>
+                            </tr>
+                        `;
+                    });
+                    $('#issue_log_table tbody').html(tableRows);
+                } else {
+                    console.error("Error fetching data: ", data.message);
+                }
+            }
+        });
+    } else {
+        // Perform search if there is text in the search bar
+        $.ajax({
+            url: 'part/status_joborder_fetch_rate.php',
+            type: 'GET',
+            data: { search: searchValue },
+            success: function(data) {
+                if (data.success) {
+                    let tableRows = '';
+                    data.data.forEach(row => {
+                        tableRows += `
+                            <tr>
+                                <td>${row.id}</td>
+                                <td>${row.issue_date}</td>
+                                <td>${row.name}</td>
+                                <td>${row.section}</td>
+                                <td>${row.job_order_nature}</td>
+                                <td>${row.description}</td>
+                                <td>${row.assign_to}</td>
+                                <td>${row.status}</td>
+                                <td>${row.button}</td>
+                            </tr>
+                        `;
+                    });
+                    $('#issue_log_table tbody').html(tableRows);
+                } else {
+                    console.error("Error fetching data: ", data.message);
+                }
+            }
+        });
+    }
+}
+
+
+
+function printPage() {
+    window.print();
+}
 </script>

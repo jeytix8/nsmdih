@@ -97,17 +97,6 @@ if (!isset($_SESSION['secured'])) {
         border: solid gray 1px;
 
     }
-    #status-filter{
-        background-color: white;
-        color: black;
-        padding: 5px;
-        text-align: center;
-        width: 150px;
-    }
-    #status-filter option{
-        background-color: white;
-        color: black;
-    }
 
      .button-container2 {
         display: flex;
@@ -193,6 +182,7 @@ if (!isset($_SESSION['secured'])) {
         display: none; /* Initially hidden */
         z-index: 10;
         border-radius: 4px;
+        width: 400px;
     }
 
     .dropdown2:hover .dropdown2-content {
@@ -234,12 +224,30 @@ if (!isset($_SESSION['secured'])) {
                         <i style="color: black;" class="bi bi-funnel-fill"></i>
                     </button>
                     <div class="dropdown2-content">
-                        <select id="status-filter" onchange="applyFilter()">
-                            <option value="All">All</option>
-                            <option value="Resolved">Resolved</option>
-                            <option value="Ongoing">Ongoing</option>
-                            <option value="Not Resolved">Not Resolved</option>
-                        </select>
+                        <div class="row">
+                            <div class="col" style="text-align: center;">
+                                <h3 style="font-size: 12px;">Filter by Month</h3>
+                                <div style="font-size: 10px; justify-items: left;" id="year_month_filter"></div>
+                            </div>
+                            <div class="col" style="text-align: center;">
+                                <h3 style="font-size: 12px; ">Filter by Section</h3>
+                                <div style="font-size: 10px; justify-items: left;" id="section_filter"></div>
+                            </div>
+                            <div class="col" style="text-align: center;">
+                                <h3 style="font-size: 12px;">Filter by Nature of Job Order</h3>
+                                <div style="font-size: 10px; justify-items: left;" id="nature_filter"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col" style="text-align: center;">
+                                <h3 style="font-size: 12px;">Filter by Assign To</h3>
+                                <div style="font-size: 10px; justify-items: left;" id="assign_filter"></div>
+                            </div>
+                            <div class="col" style="text-align: center;">
+                                <h3 style="font-size: 12px; ">Filter by Status</h3>
+                                <div style="font-size: 10px; justify-items: left;" id="status_filter"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -281,7 +289,12 @@ if (!isset($_SESSION['secured'])) {
 
 <script>
 $(document).ready(function() {
-    loadTableData(); // Load data on page load
+    loadTableData();
+    loadFilters12();    
+
+    $(document).on('change', 'input[type="checkbox"]', function() {
+        filterData12();
+    });
 });
 
 // Function to load table data (fetch only, no updates)
@@ -309,4 +322,110 @@ function sortTable(column) {
     });
 }
 
+// Function to handle searching
+function searchTable() {
+    let searchValue = $('#search-bar').val().trim();
+    $.ajax({
+        url: 'part/fetch_records.php',
+        type: 'GET',
+        data: { search: searchValue },
+        success: function(data) {
+            $('#issue_log_table tbody').html(data);
+        }
+    });
+}
+
+function loadFilters12() {
+    $.ajax({
+        url: 'part/fetch_filters.php', // Fetch filter data from your server
+        type: 'GET',
+        success: function(data) {
+            const filters = JSON.parse(data);
+
+            // Year and Month filter checkboxes
+            filters.year_month.forEach(item => {
+                $('#year_month_filter').append(`<label><input type="checkbox" class="year-month-filter" value="${item}">${item}</label><br>`);
+            });
+
+            // Section filter checkboxes
+            filters.section.forEach(section => {
+                $('#section_filter').append(`<label><input type="checkbox" class="section-filter" value="${section}">${section}</label><br>`);
+            });
+
+            // Nature of Job Order filter checkboxes
+            filters.nature.forEach(nature => {
+                $('#nature_filter').append(`<label><input type="checkbox" class="nature-filter" value="${nature}">${nature}</label><br>`);
+            });
+
+            // Assign To filter checkboxes
+            filters.assign.forEach(assign => {
+                $('#assign_filter').append(`<label><input type="checkbox" class="assign-filter" value="${assign}">${assign}</label><br>`);
+            });
+
+            // Status filter checkboxes
+            filters.status.forEach(status => {
+                $('#status_filter').append(`<label><input type="checkbox" class="status-filter" value="${status}">${status}</label><br>`);
+            });
+        }
+    });
+}
+
+// Update the filterData12 function to handle all selected filters
+function filterData12() {
+    let filters = {
+        year_month: [],
+        section: [],
+        nature: [],
+        assign: [],
+        status: []
+    };
+
+    // Collect selected checkboxes for each category
+    $('input.year-month-filter:checked').each(function() {
+        filters.year_month.push($(this).val());
+    });
+
+    $('input.section-filter:checked').each(function() {
+        filters.section.push($(this).val());
+    });
+
+    $('input.nature-filter:checked').each(function() {
+        filters.nature.push($(this).val());
+    });
+
+    $('input.assign-filter:checked').each(function() {
+        filters.assign.push($(this).val());
+    });
+
+    $('input.status-filter:checked').each(function() {
+        filters.status.push($(this).val());
+    });
+
+    // Send AJAX request with filters
+    $.ajax({
+        url: 'part/fetch_records.php',
+        type: 'GET',
+        data: filters, // Send filters as an object
+        success: function(data) {
+            $('#issue_log_table tbody').html(data);
+        }
+    });
+}
+
+
+// Function to fetch filtered data and reload the table
+function loadTableData12(filters) {
+    $.ajax({
+        url: 'part/fetch_records.php',
+        type: 'GET',
+        data: filters,
+        success: function(data) {
+            $('#issue_log_table tbody').html(data);
+        }
+    });
+}
+
+function printPage() {
+    window.print();
+}
 </script>
