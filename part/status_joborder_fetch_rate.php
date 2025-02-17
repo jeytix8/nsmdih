@@ -57,14 +57,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
 // Fetch records for the table
 $sort_by = isset($_GET['sort_by']) ? $conn->real_escape_string($_GET['sort_by']) : 'id';
 $order = isset($_GET['order']) ? strtoupper($conn->real_escape_string($_GET['order'])) : 'DESC';
+$search = isset($_GET['search']) ? $conn->real_escape_string(trim($_GET['search'])) : '';
 
 $user_section = $conn->real_escape_string($_SESSION['user_section']);
 
+// Construct the SQL query with search and sorting
 $sql = "SELECT id, 
             CONCAT(issue_year, ', ', issue_month, ' ', issue_day, ' | ', issue_time) AS issue_date, 
             name, section, job_order_nature, description, assign_to, status
         FROM records_job_order
         WHERE status != 'Closed' AND section = '$user_section'
+        AND (id LIKE '%$search%'
+          OR name LIKE '%$search%'
+          OR issue_year LIKE '%$search%'
+          OR issue_month LIKE '%$search%'
+          OR issue_day LIKE '%$search%'
+          OR issue_time LIKE '%$search%'
+          OR section LIKE '%$search%'
+          OR job_order_nature LIKE '%$search%'
+          OR description LIKE '%$search%'
+          OR assign_to LIKE '%$search%'
+          OR status LIKE '%$search%')
         ORDER BY $sort_by $order";
 
 $result = $conn->query($sql);

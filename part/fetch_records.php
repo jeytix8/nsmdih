@@ -61,19 +61,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['status'
 }
 
 
-
 // Fetch records for the table
 $sort_by = isset($_GET['sort_by']) ? $conn->real_escape_string($_GET['sort_by']) : 'id';
 $order = isset($_GET['order']) ? strtoupper($conn->real_escape_string($_GET['order'])) : 'DESC';
+$search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
 
+$filterConditions = [];
+
+// Mapping user-selected filters to the correct database columns
+if (!empty($_GET)) {
+    foreach ($_GET as $filterType => $values) {
+        if (!empty($values)) {
+            $escapedValues = array_map(fn($v) => "'" . $conn->real_escape_string($v) . "'", $values);
+
+            switch ($filterType) {
+                case 'year_month':
+                    $filterParts = [];
+                    foreach ($values as $value) {
+                        list($year, $month) = explode(', ', trim($value, "'"));
+                        $filterParts[] = "(issue_year = '$year' AND issue_month = '$month')";
+                    }
+                    $filterConditions[] = "(" . implode(" OR ", $filterParts) . ")";
+                    break;
+
+                case 'section':
+                    $filterConditions[] = "section IN (" . implode(',', $escapedValues) . ")";
+                    break;
+
+                case 'nature':
+                    $filterConditions[] = "job_order_nature IN (" . implode(',', $escapedValues) . ")";
+                    break;
+
+                case 'assign':
+                    $filterConditions[] = "assign_to IN (" . implode(',', $escapedValues) . ")";
+                    break;
+
+                case 'status':
+                    $filterConditions[] = "status IN (" . implode(',', $escapedValues) . ")";
+                    break;
+            }
+        }
+    }
+}
+
+// Construct WHERE clause dynamically
+$whereClause = count($filterConditions) > 0 ? "AND (" . implode(" AND ", $filterConditions) . ")" : "";
+
+// Main query with filters applied
 $sql = "SELECT id, 
             CONCAT(issue_year, ', ', issue_month, ' ', issue_day, ' | ', issue_time) AS issue_date, 
             name, section, job_order_nature, description, assign_to, status, 
             timestamp_received, computer_name, model, ip_address, operating_system, remarks, 
             timestamp_remarks, satisfied, unsatisfied
         FROM records_job_order
-        ORDER BY $sort_by $order";
-
+        WHERE 1=1
+        $whereClause
+        ORDER BY id DESC";
 
 $result = $conn->query($sql);
 
@@ -81,6 +124,7 @@ if (!$result) {
     die("Error executing query: " . $conn->error);
 }
 
+// Output results
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         echo "<tr>
@@ -103,8 +147,9 @@ if ($result->num_rows > 0) {
             <td>" . htmlspecialchars($row["unsatisfied"]) . "</td>
         </tr>";
     }
+} else {
+    echo "<tr><td colspan='17'>No records found</td></tr>";
 }
-
 
 $conn->close();
 ?>

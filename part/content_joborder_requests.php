@@ -97,17 +97,6 @@ if (!isset($_SESSION['secured'])) {
         border: solid gray 1px;
 
     }
-    #status-filter{
-        background-color: white;
-        color: black;
-        padding: 5px;
-        text-align: center;
-        width: 150px;
-    }
-    #status-filter option{
-        background-color: white;
-        color: black;
-    }
 
      .button-container2 {
         display: flex;
@@ -123,19 +112,11 @@ if (!isset($_SESSION['secured'])) {
         border-radius: 7px;
         height: 40px;
     }
-    .dropdown2-btn{
-         padding:5px 20px;
-        color: white;
-        background-color:#006735 ;
-        border: solid;
-        border-radius: 7px;
-        height: 40px;
+    @media print {
+        .no-print {
+            display: none;
+        }
     }
-     @media print {
-                .no-print {
-                    display: none;
-                }
-            }
 
 .assign-to-dropdown {
     height: 30px;
@@ -229,19 +210,6 @@ if (!isset($_SESSION['secured'])) {
                 <div class="search-bar-container">
                     <input type="text" id="search-bar" placeholder="Search" onkeyup="searchTable()">
                 </div>
-                <div class="dropdown2">
-                    <button class="dropdown2-btn">
-                        <i style="color: black;" class="bi bi-funnel-fill"></i>
-                    </button>
-                    <div class="dropdown2-content">
-                        <select id="status-filter" onchange="applyFilter()">
-                            <option value="All">All</option>
-                            <option value="Resolved">Resolved</option>
-                            <option value="Ongoing">Ongoing</option>
-                            <option value="Not Resolved">Not Resolved</option>
-                        </select>
-                    </div>
-                </div>
             </div>
 
             <!-- Print button -->
@@ -283,11 +251,6 @@ $(document).ready(function() {
         updateAssignment(id, assignTo);
     });
 
-    // Apply filter when the status dropdown is changed
-    $('#status-filter').change(function() {
-        let filterValue = $(this).val();
-        loadTableData(filterValue);
-    });
 });
 
 // Function to update assignment & status via AJAX
@@ -315,6 +278,9 @@ function loadTableData(search = '', sort_by = 'id', order = 'DESC') {
         data: { search: search, sort_by: sort_by, order: order },
         success: function(data) {
             $('#issue_log_table tbody').html(data);
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error:', error);
         }
     });
 }
@@ -324,6 +290,20 @@ function searchTable() {
     let searchValue = $('#search-bar').val().trim();
     loadTableData(searchValue);
 }
+
+
+function sortTable12(column) {
+    var order12 = $('#faculty_log').data('order12') === 'asc' ? 'desc' : 'asc';
+    $('#faculty_log').data('order12', order12);
+    $('#faculty_log').data('sort_by12', column); 
+    filterData12();
+}
+
+
+function printPage() {
+    window.print();
+}
+
 
 // Function to handle sorting
 function sortTable(column) {

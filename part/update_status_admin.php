@@ -66,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['status'
 // Fetch records for the table
 $sort_by = isset($_GET['sort_by']) ? $conn->real_escape_string($_GET['sort_by']) : 'id';
 $order = isset($_GET['order']) ? strtoupper($conn->real_escape_string($_GET['order'])) : 'DESC';
+$search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
 
 $sql = "SELECT id, 
             CONCAT(issue_year, ', ', issue_month, ' ', issue_day, ' | ', issue_time) AS issue_date, 
@@ -73,7 +74,22 @@ $sql = "SELECT id,
             timestamp_received, computer_name, model, ip_address, operating_system, remarks, 
             timestamp_remarks
         FROM records_job_order
-        WHERE assign_to IS NOT NULL AND assign_to != ''  
+        WHERE assign_to IS NOT NULL 
+          AND assign_to != ''  
+          AND (id LIKE '%$search%'
+          OR name LIKE '%$search%'
+          OR section LIKE '%$search%'
+          OR job_order_nature LIKE '%$search%'
+          OR description LIKE '%$search%'
+          OR assign_to LIKE '%$search%'
+          OR status LIKE '%$search%'
+          OR timestamp_received LIKE '%$search%'
+          OR computer_name LIKE '%$search%'
+          OR model LIKE '%$search%'
+          OR ip_address LIKE '%$search%'
+          OR operating_system LIKE '%$search%'
+          OR remarks LIKE '%$search%'
+          OR timestamp_remarks LIKE '%$search%')
         ORDER BY $sort_by $order";
 
 $result = $conn->query($sql);
