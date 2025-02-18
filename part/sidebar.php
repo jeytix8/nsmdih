@@ -43,7 +43,7 @@ if (!isset($_SESSION['secured'])) {
 	<div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
 		<!--begin::Logo image-->
 		<a href="index.php">
-            <img alt="Logo" src="sinai_logo.png" class="h-70px w-180px app-sidebar-logo-default" />
+            <img alt="Logo" src="sinai_logo_main.png" class="h-70px w-180px app-sidebar-logo-default" />
             <img alt="Logo" src="sinai_logo.png" class="h-40px app-sidebar-logo-minimize" />
         </a>
         <!--end::Logo image-->

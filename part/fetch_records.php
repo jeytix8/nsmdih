@@ -64,50 +64,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['status'
 // Fetch records for the table
 $sort_by = isset($_GET['sort_by']) ? $conn->real_escape_string($_GET['sort_by']) : 'id';
 $order = isset($_GET['order']) ? strtoupper($conn->real_escape_string($_GET['order'])) : 'DESC';
-$search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
+$search = isset($_GET['search']) ? trim($conn->real_escape_string($_GET['search'])) : '';
 
-$filterConditions = [];
-
-// Mapping user-selected filters to the correct database columns
-if (!empty($_GET)) {
-    foreach ($_GET as $filterType => $values) {
-        if (!empty($values)) {
-            $escapedValues = array_map(fn($v) => "'" . $conn->real_escape_string($v) . "'", $values);
-
-            switch ($filterType) {
-                case 'year_month':
-                    $filterParts = [];
-                    foreach ($values as $value) {
-                        list($year, $month) = explode(', ', trim($value, "'"));
-                        $filterParts[] = "(issue_year = '$year' AND issue_month = '$month')";
-                    }
-                    $filterConditions[] = "(" . implode(" OR ", $filterParts) . ")";
-                    break;
-
-                case 'section':
-                    $filterConditions[] = "section IN (" . implode(',', $escapedValues) . ")";
-                    break;
-
-                case 'nature':
-                    $filterConditions[] = "job_order_nature IN (" . implode(',', $escapedValues) . ")";
-                    break;
-
-                case 'assign':
-                    $filterConditions[] = "assign_to IN (" . implode(',', $escapedValues) . ")";
-                    break;
-
-                case 'status':
-                    $filterConditions[] = "status IN (" . implode(',', $escapedValues) . ")";
-                    break;
-            }
-        }
-    }
+// Search condition, apply if search term exists
+$searchCondition = "";
+if (!empty($search)) {
+    $searchCondition = "AND (
+        id LIKE '%$search%' OR 
+        CONCAT(issue_year, ', ', issue_month, ' ', issue_day, ' | ', issue_time) LIKE '%$search%' OR
+        name LIKE '%$search%' OR
+        section LIKE '%$search%' OR
+        job_order_nature LIKE '%$search%' OR
+        description LIKE '%$search%' OR
+        assign_to LIKE '%$search%' OR
+        status LIKE '%$search%' OR
+        timestamp_received LIKE '%$search%' OR
+        computer_name LIKE '%$search%' OR
+        model LIKE '%$search%' OR
+        ip_address LIKE '%$search%' OR
+        operating_system LIKE '%$search%' OR
+        remarks LIKE '%$search%' OR
+        timestamp_remarks LIKE '%$search%' OR
+        satisfied LIKE '%$search%' OR
+        unsatisfied LIKE '%$search%'
+    )";
 }
 
-// Construct WHERE clause dynamically
+// Handle filters if they are present in the GET request
+$filterConditions = [];
+
+// Loop through each filter type and build conditions based on selected values
+if (isset($_GET['year_month']) && !empty($_GET['year_month'])) {
+    $yearMonth = $_GET['year_month'];
+    if (!is_array($yearMonth)) $yearMonth = [$yearMonth]; // Ensure it's an array
+    $filterParts = [];
+    foreach ($yearMonth as $ym) {
+        list($year, $month) = explode(', ', trim($ym, "'"));
+        $filterParts[] = "(issue_year = '$year' AND issue_month = '$month')";
+    }
+    $filterConditions[] = "(" . implode(" OR ", $filterParts) . ")";
+}
+
+if (isset($_GET['section']) && !empty($_GET['section'])) {
+    $sections = $_GET['section'];
+    if (!is_array($sections)) $sections = [$sections]; // Ensure it's an array
+    $escapedSections = array_map(fn($v) => "'" . $conn->real_escape_string($v) . "'", $sections);
+    $filterConditions[] = "section IN (" . implode(',', $escapedSections) . ")";
+}
+
+if (isset($_GET['nature']) && !empty($_GET['nature'])) {
+    $natures = $_GET['nature'];
+    if (!is_array($natures)) $natures = [$natures]; // Ensure it's an array
+    $escapedNatures = array_map(fn($v) => "'" . $conn->real_escape_string($v) . "'", $natures);
+    $filterConditions[] = "job_order_nature IN (" . implode(',', $escapedNatures) . ")";
+}
+
+if (isset($_GET['assign']) && !empty($_GET['assign'])) {
+    $assigns = $_GET['assign'];
+    if (!is_array($assigns)) $assigns = [$assigns]; // Ensure it's an array
+    $escapedAssigns = array_map(fn($v) => "'" . $conn->real_escape_string($v) . "'", $assigns);
+    $filterConditions[] = "assign_to IN (" . implode(',', $escapedAssigns) . ")";
+}
+
+if (isset($_GET['status']) && !empty($_GET['status'])) {
+    $statuses = $_GET['status'];
+    if (!is_array($statuses)) $statuses = [$statuses]; // Ensure it's an array
+    $escapedStatuses = array_map(fn($v) => "'" . $conn->real_escape_string($v) . "'", $statuses);
+    $filterConditions[] = "status IN (" . implode(',', $escapedStatuses) . ")";
+}
+
+// Combine the filters and search conditions
 $whereClause = count($filterConditions) > 0 ? "AND (" . implode(" AND ", $filterConditions) . ")" : "";
 
-// Main query with filters applied
+// Main query with filters and search applied
 $sql = "SELECT id, 
             CONCAT(issue_year, ', ', issue_month, ' ', issue_day, ' | ', issue_time) AS issue_date, 
             name, section, job_order_nature, description, assign_to, status, 
@@ -116,7 +145,9 @@ $sql = "SELECT id,
         FROM records_job_order
         WHERE 1=1
         $whereClause
-        ORDER BY id DESC";
+        $searchCondition
+        ORDER BY $sort_by $order";
+
 
 $result = $conn->query($sql);
 

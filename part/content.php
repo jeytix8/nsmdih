@@ -21,7 +21,7 @@ $section = isset($_GET['section']) ? $_GET['section'] : 'dashboard';  // Set def
             <!-- Show content conditionally based on the clicked sidebar link -->
             
             <?php if ($section === 'dashboard') : ?>
-                <?php include "dashboard.php"; ?>
+                <?php include "analytics.php"; ?>
             <?php elseif ($section === 'request') : ?>
                 <?php include "content_joborder_requests.php"; ?>
             <?php elseif ($section === 'assignment') : ?>

@@ -152,50 +152,95 @@ if (!isset($_SESSION['secured'])) {
         box-sizing: border-box;
     }
 
-    .dropdown2 {
-        position: relative; /* Needed for dropdown positioning */
-        display: flex;
-        align-items: center;
-    }
+   /* Dropdown button and content styling */
+.dropdown2 {
+    position: relative; /* Needed for dropdown positioning */
+    display: flex;
+    align-items: center;
+}
 
-    .dropdown2-btn {
-        background-color: white;
-        border: 1px solid white;
-        border-radius: 4px;
-        padding: 5px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 38px; /* Matches the height of the search bar */
-        width: 45px; /* Square button for the icon */
-    }
+.dropdown2-btn {
+    background-color: white;
+    border: 1px solid white;
+    border-radius: 4px;
+    padding: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px; /* Matches the height of the search bar */
+    width: 45px; /* Square button for the icon */
+}
 
-    .dropdown2-content {
-        position: absolute;
-        top: 101%; /* Dropdown below the button */
-        left: 0;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        padding: 5px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
-        display: none; /* Initially hidden */
-        z-index: 10;
-        border-radius: 4px;
-        width: 400px;
-    }
+.dropdown2-content {
+    position: absolute;
+    top: 101%; /* Dropdown below the button */
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 5px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
+    display: none; /* Initially hidden */
+    z-index: 10;
+    border-radius: 4px;
+    width: 600px;
+}
 
-    .dropdown2:hover .dropdown2-content {
-        display: block; /* Show dropdown on hover */
-    }
+.dropdown2:hover .dropdown2-content {
+    display: block; /* Show dropdown on hover */
+}
 
-    .dropdown2-content select {
-        width: 150px;
-        padding: 5px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
-    }
+.dropdown2-content select {
+    width: 150px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Layout of filter sections inside the dropdown */
+.row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap; /* Allows columns to wrap to the next line if space is tight */
+    gap: 10px; /* Add space between columns */
+    margin: 6px;
+}
+
+.col {
+    flex: 1; /* Distribute space evenly across columns */
+    text-align: left; /* Align text and checkboxes to the left */
+    font-size: 10px;
+}
+
+.filter-title {
+    font-size: 12px;
+}
+.filter-title2{
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+/* Styling the filters to be block elements */
+#year_month_filter, #section_filter, #nature_filter, #assign_filter, #status_filter {
+    display: block;
+}
+
+/* Styling individual checkbox labels within each filter section */
+#year_month_filter label,
+#section_filter label,
+#nature_filter label,
+#assign_filter label,
+#status_filter label {
+    display: inline-flex; /* Align items horizontally */
+    margin-bottom: -15px;
+}
+
+/* Optional: Add additional styling for individual checkboxes */
+input[type="checkbox"] {
+    margin-right: 4px;
+}
+
 
     .button {
         background-color: #007bff;
@@ -209,6 +254,7 @@ if (!isset($_SESSION['secured'])) {
     .button:hover {
         background-color: #0056b3;
     }
+    
 </style>
 
     <div id="issue_ticket">
@@ -217,7 +263,7 @@ if (!isset($_SESSION['secured'])) {
             <div class="filter-search-container">
                 <!-- Filtering Dropdown with Clickable Button -->
                 <div class="search-bar-container">
-                    <input type="text" id="search-bar" placeholder="Search" onkeyup="searchTable()">
+                    <input type="text" id="search-bar" placeholder="Search" onkeyup="fetchData()">
                 </div>
                 <div class="dropdown2">
                     <button class="dropdown2-btn">
@@ -225,34 +271,31 @@ if (!isset($_SESSION['secured'])) {
                     </button>
                     <div class="dropdown2-content">
                         <div class="row">
-                            <div class="col" style="text-align: center;">
-                                <h3 style="font-size: 12px;">Filter by Month</h3>
-                                <div style="font-size: 10px; justify-items: left;" id="year_month_filter"></div>
+                            <div class="col">
+                                <h3 class="filter-title">Filter by Assign To</h3>
+                                <div id="assign_filter"></div>
                             </div>
-                            <div class="col" style="text-align: center;">
-                                <h3 style="font-size: 12px; ">Filter by Section</h3>
-                                <div style="font-size: 10px; justify-items: left;" id="section_filter"></div>
+                            <div class="col">
+                                <h3 class="filter-title">Filter by Status</h3>
+                                <div id="status_filter"></div>
                             </div>
-                            <div class="col" style="text-align: center;">
-                                <h3 style="font-size: 12px;">Filter by Nature of Job Order</h3>
-                                <div style="font-size: 10px; justify-items: left;" id="nature_filter"></div>
+                            <div class="col">
+                                <h3 class="filter-title">Filter by Nature of Job Order</h3>
+                                <div id="nature_filter"></div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col" style="text-align: center;">
-                                <h3 style="font-size: 12px;">Filter by Assign To</h3>
-                                <div style="font-size: 10px; justify-items: left;" id="assign_filter"></div>
+                            <div class="col">
+                                <h3 class="filter-title2">Filter by Month</h3>
+                                <div id="year_month_filter"></div>
                             </div>
-                            <div class="col" style="text-align: center;">
-                                <h3 style="font-size: 12px; ">Filter by Status</h3>
-                                <div style="font-size: 10px; justify-items: left;" id="status_filter"></div>
+                            <div class="col">
+                                <h3 class="filter-title2">Filter by Section</h3>
+                                <div id="section_filter"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Search bar -->
-                
             </div>
 
             <!-- Print button -->
@@ -289,11 +332,17 @@ if (!isset($_SESSION['secured'])) {
 
 <script>
 $(document).ready(function() {
-    loadTableData();
-    loadFilters12();    
+    loadTableData();  // Initial load of table
+    loadFilters12();   // Load the filters
 
+    // Search bar input handler
+    $('#search-bar').on('keyup', function() {
+        fetchData(); // Re-fetch data when user types in search bar
+    });
+
+    // Filter change handler
     $(document).on('change', 'input[type="checkbox"]', function() {
-        filterData12();
+        fetchData(); // Re-fetch data when any filter changes
     });
 });
 
@@ -306,34 +355,76 @@ function loadTableData() {
 
 // Function to sort the table
 function sortTable(column) {
-    const currentOrder = $('#issue_log_table').data('order') || 'asc';
-    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+    let currentOrder = localStorage.getItem('sortOrder') || 'asc';
+    let newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
 
-    $('#issue_log_table').data('order', newOrder);
-    $('#issue_log_table').data('sort_by', column);
+    localStorage.setItem('sortOrder', newOrder);
+    localStorage.setItem('sortColumn', column);
 
-    $.ajax({
-        url: 'part/fetch_records.php', // Fetch-only script
-        type: 'GET',
-        data: { sort_by: column, order: newOrder },
-        success: function(data) {
-            $('#issue_log_table tbody').html(data);
-        }
-    });
+    fetchData(); // Fetch updated data with new sorting
 }
 
-// Function to handle searching
-function searchTable() {
+
+// Apply sorting and search when the page loads
+$(document).ready(function() {
+    fetchData();  // Load data with sorting and search
+});
+
+// Function to handle searching and filtering
+function fetchData() {
     let searchValue = $('#search-bar').val().trim();
+    let sortBy = localStorage.getItem('sortColumn') || 'id';
+    let order = localStorage.getItem('sortOrder') || 'asc';
+
+    // Collect selected filters
+    let filters = {
+        search: searchValue,  // Include the search term
+        sort_by: sortBy,
+        order: order
+    };
+
+    // Collect selected checkboxes for each filter
+    $('input.year-month-filter:checked').each(function() {
+        if (!filters.year_month) filters.year_month = [];
+        filters.year_month.push($(this).val());
+    });
+
+    $('input.section-filter:checked').each(function() {
+        if (!filters.section) filters.section = [];
+        filters.section.push($(this).val());
+    });
+
+    $('input.nature-filter:checked').each(function() {
+        if (!filters.nature) filters.nature = [];
+        filters.nature.push($(this).val());
+    });
+
+    $('input.assign-filter:checked').each(function() {
+        if (!filters.assign) filters.assign = [];
+        filters.assign.push($(this).val());
+    });
+
+    $('input.status-filter:checked').each(function() {
+        if (!filters.status) filters.status = [];
+        filters.status.push($(this).val());
+    });
+
+    // Send the AJAX request with both search and filters
     $.ajax({
         url: 'part/fetch_records.php',
         type: 'GET',
-        data: { search: searchValue },
+        data: filters,  // Send all filters (search + selected filters)
         success: function(data) {
-            $('#issue_log_table tbody').html(data);
+            $('#issue_log_table tbody').html(data);  // Update the table
         }
     });
 }
+
+// Apply sorting and search when the page loads
+$(document).ready(function() {
+    fetchData(); // Load initial data with sorting and search applied
+});
+
 
 function loadFilters12() {
     $.ajax({

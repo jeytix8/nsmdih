@@ -1,34 +1,39 @@
 <?php
-require_once 'connect.php'; // Ensure correct DB connection
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+header('Content-Type: application/json');
 
-$type = isset($_GET['type']) ? $_GET['type'] : '';
+include('../connect.php');
 
-$response = [];
+$selectedSection = isset($_GET['section']) ? $conn->real_escape_string($_GET['section']) : '';
 
-if ($type === 'job_order_per_department') {
-    // Count Job Orders per Department
-    $query = "SELECT department, COUNT(*) AS count FROM records_job_order GROUP BY department";
-} elseif ($type === 'job_order_by_type') {
-    // Count Job Orders by Type
-    $query = "SELECT job_order_nature, COUNT(*) AS count FROM records_job_order GROUP BY job_order_nature";
-} elseif ($type === 'satisfaction_survey') {
-    // Calculate Average Satisfaction per Department
-    $query = "SELECT department, ROUND(SUM(satisfied) / COUNT(*), 2) AS avg_satisfaction 
-              FROM records_job_order 
-              GROUP BY department";
-} else {
-    echo json_encode(['error' => 'Invalid type']);
-    exit();
+// Get job order count per section
+$sectionCounts = [];
+$querySectionCounts = "SELECT section, COUNT(*) as count FROM records_job_order GROUP BY section ORDER BY section ASC";
+$resultSectionCounts = $conn->query($querySectionCounts);
+while ($row = $resultSectionCounts->fetch_assoc()) {
+    $sectionCounts[$row['section']] = $row['count'];
 }
 
-$result = mysqli_query($conn, $query);
-if (!$result) {
-    die(json_encode(['error' => mysqli_error($conn)]));
+// Get job order nature count per section
+$jobOrderCounts = [];
+$queryJobOrders = "SELECT job_order_nature, COUNT(*) as count FROM records_job_order";
+
+if (!empty($selectedSection)) {
+    $queryJobOrders .= " WHERE section = '$selectedSection'";
 }
 
-while ($row = mysqli_fetch_assoc($result)) {
-    $response[] = $row;
+$queryJobOrders .= " GROUP BY job_order_nature ORDER BY job_order_nature ASC";
+$resultJobOrders = $conn->query($queryJobOrders);
+while ($row = $resultJobOrders->fetch_assoc()) {
+    $jobOrderCounts[$row['job_order_nature']] = $row['count'];
 }
+
+$response = [
+    'sectionCounts' => $sectionCounts,
+    'jobOrderCounts' => $jobOrderCounts,
+    'totalJobOrders' => array_sum($sectionCounts)
+];
 
 echo json_encode($response);
 ?>
