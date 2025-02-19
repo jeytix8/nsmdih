@@ -164,7 +164,8 @@ function updateCharts(data) {
         return new Chart(ctx, {
             type: 'bar',
             data: { labels: labels, datasets: [{ label: labelText, data: values, backgroundColor: bgColor, borderWidth: 1 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: {
+                padding: 6 } } } },
             plugins: [{
                 afterDraw: function(chart) { 
                     let ctx = chart.ctx;
