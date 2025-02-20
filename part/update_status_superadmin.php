@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['assign_
 }
 
 // Fetch IT & Communication employees
-$employees_sql = "SELECT name FROM employees WHERE section = 'IT & Communication'";
+$employees_sql = "SELECT name FROM employees WHERE section = 'IT & Communication' ORDER BY name ASC";
 $employees_result = $conn->query($employees_sql);
 $employees = [];
 while ($row = $employees_result->fetch_assoc()) {

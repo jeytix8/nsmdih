@@ -102,104 +102,89 @@ if (!isset($_SESSION['secured'])) {
         display: flex;
         justify-content: space-between;
         margin: 20px;
+    }
 
-    }
-     .button-container2 .button{
-        padding:5px 20px;
-        color: white;
-        background-color:#006735 ;
-        border: solid;
-        border-radius: 7px;
-        height: 40px;
-    }
     @media print {
         .no-print {
             display: none;
         }
     }
 
-.assign-to-dropdown {
-    height: 30px;
-}
+    .assign-to-dropdown {
+        height: 30px;
+    }
 
-.button-container2 {
-    display: flex;
-    align-items: center;
-    justify-content: space-between; 
-    margin: 20px;
-}
+    .filter-search-container {
+        display: flex;
+        align-items: center;
+        gap: 15px; /* Minimal space between the filter icon and search bar */
+    }
 
-.filter-search-container {
-    display: flex;
-    align-items: center;
-    gap: 15px; /* Minimal space between the filter icon and search bar */
-}
+    .search-bar-container input {
+        padding: 5px;
+        font-size: 14px;
+        width: 200px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
 
-.search-bar-container input {
-    padding: 5px;
-    font-size: 14px;
-    width: 200px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
+    .dropdown2 {
+        position: relative; /* Needed for dropdown positioning */
+        display: flex;
+        align-items: center;
+    }
 
-.dropdown2 {
-    position: relative; /* Needed for dropdown positioning */
-    display: flex;
-    align-items: center;
-}
+    .dropdown2-btn {
+        background-color: white;
+        border: 1px solid white;
+        border-radius: 4px;
+        padding: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 38px; /* Matches the height of the search bar */
+        width: 45px; /* Square button for the icon */
+    }
 
-.dropdown2-btn {
-    background-color: white;
-    border: 1px solid white;
-    border-radius: 4px;
-    padding: 5px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 38px; /* Matches the height of the search bar */
-    width: 45px; /* Square button for the icon */
-}
+    .dropdown2-content {
+        position: absolute;
+        top: 101%; /* Dropdown below the button */
+        left: 0;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        padding: 5px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
+        display: none; /* Initially hidden */
+        z-index: 10;
+        border-radius: 4px;
+    }
 
-.dropdown2-content {
-    position: absolute;
-    top: 101%; /* Dropdown below the button */
-    left: 0;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 5px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
-    display: none; /* Initially hidden */
-    z-index: 10;
-    border-radius: 4px;
-}
+    .dropdown2:hover .dropdown2-content {
+        display: block; /* Show dropdown on hover */
+    }
 
-.dropdown2:hover .dropdown2-content {
-    display: block; /* Show dropdown on hover */
-}
+    .dropdown2-content select {
+        width: 150px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+    }
 
-.dropdown2-content select {
-    width: 150px;
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-}
+    .button {
+        background-color: #1a0c80;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
 
-.button {
-    background-color: #007bff;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.button:hover {
-    background-color: #0056b3;
-}
+    .button:hover {
+        background-color: #3725b3;
+    }
 </style>
 
     <div id="issue_ticket">
@@ -220,17 +205,17 @@ if (!isset($_SESSION['secured'])) {
     <table class='issue-log-table' id='issue_log_table'>
         <thead>
             <tr>
-                <th onclick="sortTable('id')">ID <i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('issue_date')">Timestamp <i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('name')">Name <i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('section')">Section <i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('job_order_nature')">Nature of Job Order <i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('description')">Description <i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('assign_to')">Assign To <i class='fas fa-sort'></i></th> <!-- Dropdown -->
-                <th onclick="sortTable('status')">Status <i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('timestamp_received')">Timestamp Received<i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('remarks')">Remarks <i class='fas fa-sort'></i></th>
-                <th onclick="sortTable('timestamp_remarks')">Timestamp Remarks<i class='fas fa-sort'></i></th>
+                <th data-column="id">ID <i class='fas fa-sort'></i></th>
+                <th data-column="issue_date">Timestamp <i class='fas fa-sort'></i></th>
+                <th data-column="name">Name <i class='fas fa-sort'></i></th>
+                <th data-column="section">Section <i class='fas fa-sort'></i></th>
+                <th data-column="job_order_nature">Nature of Job Order <i class='fas fa-sort'></i></th>
+                <th data-column="description">Description <i class='fas fa-sort'></i></th>
+                <th data-column="assign_to">Assign To <i class='fas fa-sort'></i></th>
+                <th data-column="status">Status <i class='fas fa-sort'></i></th>
+                <th data-column="timestamp_received">Timestamp Received <i class='fas fa-sort'></i></th>
+                <th data-column="remarks">Remarks <i class='fas fa-sort'></i></th>
+                <th data-column="timestamp_remarks">Timestamp Remarks <i class='fas fa-sort'></i></th>
             </tr>
         </thead>
         <tbody>
@@ -249,6 +234,29 @@ $(document).ready(function() {
         let id = $(this).data('id');
         let assignTo = $(this).val();
         updateAssignment(id, assignTo);
+    });
+
+    // Handle searching dynamically
+    $('#search-bar').on('keyup', function() {
+        let searchValue = $(this).val().trim();
+        let sortBy = $('#issue_log_table').data('sort_by') || 'id';
+        let order = $('#issue_log_table').data('order') || 'DESC';
+        loadTableData(searchValue, sortBy, order);
+    });
+
+    // Handle sorting when a column is clicked
+    $('.issue-log-table th').on('click', function() {
+        let column = $(this).data('column'); // Get column name from data attribute
+        if (!column) return; // Ignore if no column specified
+
+        let currentOrder = $('#issue_log_table').data('order') || 'ASC';
+        let newOrder = (currentOrder === 'ASC') ? 'DESC' : 'ASC';
+
+        $('#issue_log_table').data('order', newOrder);
+        $('#issue_log_table').data('sort_by', column);
+
+        let searchValue = $('#search-bar').val().trim(); // Retain search value
+        loadTableData(searchValue, column, newOrder);
     });
 
 });

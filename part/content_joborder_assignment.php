@@ -104,14 +104,7 @@ if (!isset($_SESSION['secured'])) {
         margin: 20px;
 
     }
-     .button-container2 .button{
-        padding:5px 20px;
-        color: white;
-        background-color:#006735 ;
-        border: solid;
-        border-radius: 7px;
-        height: 40px;
-    }
+    
     @media print {
         .no-print {
             display: none;
@@ -120,13 +113,6 @@ if (!isset($_SESSION['secured'])) {
 
     .assign-to-dropdown {
         height: 30px;
-    }
-
-    .button-container2 {
-        display: flex;
-        align-items: center;
-        justify-content: space-between; 
-        margin: 20px;
     }
 
     .filter-search-container {
@@ -145,7 +131,7 @@ if (!isset($_SESSION['secured'])) {
     }
 
     .button {
-        background-color: #007bff;
+        background-color: #1a0c80;
         color: white;
         padding: 8px 16px;
         border: none;
@@ -154,7 +140,7 @@ if (!isset($_SESSION['secured'])) {
     }
 
     .button:hover {
-        background-color: #0056b3;
+        background-color: #3725b3;
     }
 </style>
 
@@ -294,6 +280,10 @@ $(document).ready(function () {
             updateStatus(id, newStatus);
         }
     });
+    // Handle search input
+    $("#search-bar").on("keyup", function () {
+        searchTable();
+    });
 });
 
 
@@ -323,39 +313,34 @@ function updateStatus(id, newStatus, computer_name = '', model = '', ip_address 
 
 
 function loadTableData() {
-    $.get('part/update_status_admin.php', function(data) {
-        $('#issue_log_table tbody').html(data);
+    let searchValue = $("#search-bar").val().trim();
+    let sortBy = $("#issue_log_table").data("sort_by") || "id";  // Default sorting column
+    let order = $("#issue_log_table").data("order") || "asc";    // Default order
+
+    $.ajax({
+        url: "part/update_status_admin.php",
+        type: "GET",
+        data: { search: searchValue, sort_by: sortBy, order: order },
+        success: function (data) {
+            $("#issue_log_table tbody").html(data);
+        }
     });
 }
 
-// Function to sort the table
+// Function to sort table while keeping search value
 function sortTable(column) {
-    const currentOrder = $('#issue_log_table').data('order') || 'asc';
-    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+    let currentOrder = $("#issue_log_table").data("order") || "asc";
+    let newOrder = currentOrder === "asc" ? "desc" : "asc";
 
-    $('#issue_log_table').data('order', newOrder);
-    $('#issue_log_table').data('sort_by', column);
+    $("#issue_log_table").data("sort_by", column);
+    $("#issue_log_table").data("order", newOrder);
 
-    $.ajax({
-        url: 'part/update_status_admin.php',
-        type: 'GET',
-        data: { sort_by: column, order: newOrder },
-        success: function(data) {
-            $('#issue_log_table tbody').html(data);
-        }
-    });
+    loadTableData(); // Reload table with new sorting
 }
 
+// Function to search while keeping sorting order
 function searchTable() {
-    let searchValue = $('#search-bar').val().trim();
-    $.ajax({
-        url: 'part/update_status_admin.php',
-        type: 'GET',
-        data: { search: searchValue },
-        success: function(data) {
-            $('#issue_log_table tbody').html(data);
-        }
-    });
+    loadTableData(); // Reload table with new search
 }
 
 

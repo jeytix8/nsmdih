@@ -72,7 +72,9 @@ mysqli_close($conn);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Form</title>
+    <link rel="shortcut icon" href="../sinai_logo.png" />
     <link href="../assets/css/style.bundle.css" rel="stylesheet">
+
     <style>
         body {
             background: url('../background.jpg') no-repeat top center fixed;

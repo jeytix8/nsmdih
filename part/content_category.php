@@ -10,117 +10,107 @@ if (!isset($_SESSION['secured'])) {
 
 require_once 'connect.php'; // Adjust based on your actual connection file
 
-$query = "SELECT id, category FROM category_job_order ORDER BY id ASC";
+$query = "SELECT id, category FROM category_job_order ORDER BY category ASC";
 $result = mysqli_query($conn, $query);
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Category Job Order</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
 
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            width: 40%;
-            margin: 10% auto;
-            text-align: center;
-            border-radius: 5px;
-            position: relative;
-        }
+    .modal-content {
+        background-color: white;
+        padding: 20px;
+        width: 40%;
+        margin: 10% auto;
+        text-align: center;
+        border-radius: 5px;
+        position: relative;
+    }
 
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 20px;
-            cursor: pointer;
-        }
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 20px;
+        cursor: pointer;
+    }
 
-        .button-container2 {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
+    .button-container2 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
 
-        #search-bar {
-            width: 100%;
-            max-width: 300px;
-            padding: 8px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+    #search-bar {
+        width: 100%;
+        max-width: 300px;
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
 
-        .insert-btn {
-            background-color: #388e3c;
-            color: white;
-            padding: 10px 15px;
-            font-size: 14px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-left: 10px;
-        }
+    .insert-btn {
+        background-color: #388e3c;
+        color: white;
+        padding: 10px 15px;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-left: 10px;
+    }
 
-        .content-category-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 13px;
-            text-align: center;
-        }
-        .content-category-table th, .content-category-table td {
-            border: 1px solid #ddd;
-            padding: 7px;
-        }
-        .content-category-table th {
-            background-color: white;
-            color: black;
-            cursor: pointer;
-        }
-        .content-category-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .content-category-table tr:hover {
-            background-color: #f1f1f1;
-        }
+    .content-category-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 13px;
+        text-align: center;
+    }
+    .content-category-table th, .content-category-table td {
+        border: 1px solid #ddd;
+        padding: 7px;
+    }
+    .content-category-table th {
+        background-color: white;
+        color: black;
+        cursor: pointer;
+    }
+    .content-category-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    .content-category-table tr:hover {
+        background-color: #f1f1f1;
+    }
 
-        .action-button {
-            padding: 5px 10px;
-            font-size: 12px;
-            margin: 2px;
-            border: none;
-            cursor: pointer;
-            border-radius: 3px;
-        }
-        .update-btn {
-            background-color: #fbc02d;
-            color: black;
-        }
-        .delete-btn {
-            background-color: #d32f2f;
-            color: white;
-        }
-    </style>
-</head>
-<body>
+    .action-button {
+        padding: 5px 10px;
+        font-size: 12px;
+        margin: 2px;
+        border: none;
+        cursor: pointer;
+        border-radius: 3px;
+    }
+    .update-btn {
+        background-color: #fbc02d;
+        color: black;
+    }
+    .delete-btn {
+        background-color: #d32f2f;
+        color: white;
+    }
+</style>
 
 <div id="content_category">
     <div class="button-container2">
@@ -146,11 +136,12 @@ $result = mysqli_query($conn, $query);
 <table class='content-category-table' id='content_category_table'>
     <thead>
         <tr>
-            <th hidden>ID</th>
-            <th>Category</th>
-            <th>Actions</th>
+            <th hidden>ID</th> <!-- Keep ID hidden -->
+            <th onclick="sortTableCategory()">Category <i class="fas fa-sort"></i></th>
+            <th>Actions</th> <!-- No sorting for actions -->
         </tr>
     </thead>
+
     <tbody>
         <?php while ($row = $result->fetch_assoc()) { ?>
             <tr>
@@ -180,7 +171,36 @@ $result = mysqli_query($conn, $query);
         }
     }
 
-   function openInsertModal() {
+    function sortTableCategory() {
+        let table = document.getElementById("content_category_table");
+        let rows = Array.from(table.getElementsByTagName("tbody")[0].rows);
+        let icon = document.querySelector("th[onclick='sortTableCategory()'] i");
+
+        // Get current sorting order (default to ASC if not set)
+        let currentOrder = table.dataset.order || "ASC";
+        let newOrder = currentOrder === "ASC" ? "DESC" : "ASC";
+        table.dataset.order = newOrder;
+
+        // Sort rows based on category column (index 1)
+        rows.sort((rowA, rowB) => {
+            let cellA = rowA.cells[1].textContent.trim().toLowerCase();
+            let cellB = rowB.cells[1].textContent.trim().toLowerCase();
+
+            if (newOrder === "ASC") return cellA.localeCompare(cellB);
+            return cellB.localeCompare(cellA);
+        });
+
+        // Append sorted rows back to the table
+        let tbody = table.getElementsByTagName("tbody")[0];
+        tbody.innerHTML = ""; // Clear existing rows
+        rows.forEach(row => tbody.appendChild(row));
+
+        // Update sorting icon
+        document.querySelectorAll("th i").forEach(i => i.className = "fas fa-sort"); // Reset all icons
+        icon.className = newOrder === "ASC" ? "fas fa-sort-up" : "fas fa-sort-down"; // Set correct icon
+    }
+
+    function openInsertModal() {
         let modal = document.getElementById("insertModal");
         modal.style.display = "block";
     }
@@ -232,6 +252,3 @@ $result = mysqli_query($conn, $query);
         }
     }
 </script>
-
-</body>
-</html>

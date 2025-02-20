@@ -222,6 +222,24 @@ if (!isset($_SESSION['secured'])) {
                     </div>
 
                     <div class="menu-item">
+                        <a class="menu-link" href="#" onclick="showSection(event, 'employee_section');">
+                            <span class="menu-icon">
+                                <span class="svg-icon svg-icon-2" style="color: yellow;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                                        <g id="duotune">
+                                            <!-- Document background -->
+                                            <path opacity="0.6" d="M4 2h12l4 4v14c0 .55-.45 1-1 1H4c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1zM16 7h4l-4-4v4z" />
+                                            <!-- Plus mark for submission -->
+                                            <path d="M12 9c.55 0 1 .45 1 1v2h2c.55 0 1 .45 1 1s-.45 1-1 1h-2v2c0 .55-.45 1-1 1s-1-.45-1-1v-2H9c-.55 0-1-.45-1-1s.45-1 1-1h2V10c0-.55.45-1 1-1z" />
+                                        </g>
+                                    </svg>
+                                </span>
+                            </span>
+                            <span class="menu-title" style="color:white">Employees</span>
+                        </a>
+                    </div>
+
+                    <div class="menu-item">
                         <a class="menu-link" href="#" onclick="showSection(event, 'user_account');">
                             <span class="menu-icon">
                                 <span class="svg-icon svg-icon-2" style="color: yellow;">
@@ -274,14 +292,14 @@ if (!isset($_SESSION['secured'])) {
 <script>    
 
 
-    function showSection(event, sectionId, analyticsPage, isLogHistory = false) {
+    function showSection(event, sectionId, isLogHistory = false) {
         event.preventDefault(); // Prevent default action
 
         // Set the URL parameter based on the clicked section
-        window.location.href = window.location.pathname + '?section=' + sectionId + '&analytics=' + analyticsPage + '&isLogHistory=' + isLogHistory;
+        window.location.href = window.location.pathname + '?section=' + sectionId + '&isLogHistory=' + isLogHistory;
 
         // Hide all sections
-        var sections = document.querySelectorAll('#dashboard, #request, #assignment, #records, #student_acc, #faculty_acc, #staff_acc, #admin_acc, #job_order, #job_order_status, #archive, #category_section');
+        var sections = document.querySelectorAll('#dashboard, #request, #assignment, #records, #student_acc, #faculty_acc, #staff_acc, #admin_acc, #job_order, #job_order_status, #archive, #category_section, #employee_section, #user_account');
         sections.forEach(function(section) {
             section.style.display = 'none';
         });
