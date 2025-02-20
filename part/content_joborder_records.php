@@ -14,7 +14,7 @@ if (!isset($_SESSION['secured'])) {
         width: 100%;
         border-collapse: collapse;
         margin: 20px 0;
-        font-size: 11px;
+        font-size: 10px;
         text-align: center;
     }
     .issue-log-table th, .issue-log-table td {
@@ -25,6 +25,7 @@ if (!isset($_SESSION['secured'])) {
         background-color: white;
         color: black;
         cursor: pointer;
+        font-size: 11px;
     }
     .issue-log-table tr:nth-child(even) {
         background-color: #f9f9f9;
@@ -104,14 +105,7 @@ if (!isset($_SESSION['secured'])) {
         margin: 20px;
 
     }
-     .button-container2 .button{
-        padding:5px 20px;
-        color: white;
-        background-color:#006735 ;
-        border: solid;
-        border-radius: 7px;
-        height: 40px;
-    }
+
     .dropdown2-btn{
          padding:5px 20px;
         color: white;
@@ -121,20 +115,13 @@ if (!isset($_SESSION['secured'])) {
         height: 40px;
     }
      @media print {
-                .no-print {
-                    display: none;
-                }
-            }
+        .no-print {
+            display: none;
+        }
+    }
 
     .assign-to-dropdown {
         height: 30px;
-    }
-
-    .button-container2 {
-        display: flex;
-        align-items: center;
-        justify-content: space-between; 
-        margin: 20px;
     }
 
     .filter-search-container {
@@ -161,15 +148,14 @@ if (!isset($_SESSION['secured'])) {
 
 .dropdown2-btn {
     background-color: white;
-    border: 1px solid white;
-    border-radius: 4px;
-    padding: 5px;
+    border: 1px solid #ccc;
+    padding: 12px 12px;
     cursor: pointer;
+    border-radius: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 38px; /* Matches the height of the search bar */
-    width: 45px; /* Square button for the icon */
+    height: 33px;
 }
 
 .dropdown2-content {
@@ -241,9 +227,8 @@ input[type="checkbox"] {
     margin-right: 4px;
 }
 
-
     .button {
-        background-color: #007bff;
+        background-color: #1a0c80;
         color: white;
         padding: 8px 16px;
         border: none;
@@ -252,9 +237,8 @@ input[type="checkbox"] {
     }
 
     .button:hover {
-        background-color: #0056b3;
+        background-color: #3725b3;
     }
-    
 </style>
 
     <div id="issue_ticket">

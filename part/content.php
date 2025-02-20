@@ -28,16 +28,16 @@ $section = isset($_GET['section']) ? $_GET['section'] : 'dashboard';  // Set def
                 <?php include "content_joborder_assignment.php"; ?>
             <?php elseif ($section === 'records') : ?>
                 <?php include "content_joborder_records.php"; ?>
-            <?php elseif (in_array($section, ['student_acc', 'faculty_acc', 'staff_acc', 'admin_acc'])) : ?>
-                <?php include "content_adminnewacc.php"; ?>
             <?php elseif ($section === 'job_order') : ?>
                 <?php include "form_joborder.php"; ?>
             <?php elseif ($section === 'job_order_status') : ?>
                 <?php include "status_joborder.php"; ?>
             <?php elseif ($section === 'category_section') : ?>
                 <?php include "content_category.php"; ?>
-            <?php elseif ($section === 'archive') : ?>
-                <?php include "unarchive_frontend.php";?>
+            <?php elseif ($section === 'user_account') : ?>
+                <?php include "content_user.php";?>
+            <?php elseif ($section === 'employee_section') : ?>
+                <?php include "content_employee.php";?>
             <?php else : ?>
                 <p>Invalid section. Please select a valid section from the sidebar.</p>
             <?php endif; ?>

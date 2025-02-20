@@ -21,7 +21,7 @@ $user_section = $_SESSION['user_section']; // User's section
 $job_orders = [];
 
 // Fetch job orders
-$job_stmt = $conn->prepare("SELECT category FROM category_job_order");
+$job_stmt = $conn->prepare("SELECT category FROM category_job_order ORDER BY category ASC");
 $job_stmt->execute();
 $job_stmt->bind_result($job_order);
 while ($job_stmt->fetch()) {
@@ -31,7 +31,7 @@ $job_stmt->close();
 
 // Fetch employees for the name dropdown
 $employees = [];
-$emp_stmt = $conn->prepare("SELECT name FROM employees WHERE section = ?");
+$emp_stmt = $conn->prepare("SELECT name FROM employees WHERE section = ? ORDER BY name ASC");
 $emp_stmt->bind_param("s", $user_section);
 $emp_stmt->execute();
 $emp_stmt->bind_result($emp_name);

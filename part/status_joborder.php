@@ -22,13 +22,18 @@ if (!isset($_SESSION['secured'])) {
         padding: 7px;
     }
     .issue-log-table th {
-        background-color: white;
+        background-color: #2a1aa1;
         color: black;
         cursor: pointer;
+        color: whitesmoke;
+    }
+    .issue-log-table tr:nth-child(odd) {
+        background-color: rgba(26, 12, 128, 0.06); /* 2% opacity */
     }
     .issue-log-table tr:nth-child(even) {
-        background-color: #f9f9f9;
+        background-color: rgba(26, 12, 128, 0.03); /* 2% opacity */
     }
+    
     .issue-log-table tr:hover {
         background-color: #f1f1f1;
     }
@@ -59,14 +64,6 @@ if (!isset($_SESSION['secured'])) {
         margin: 20px;
 
     }
-     .button-container2 .button{
-        padding:5px 20px;
-        color: white;
-        background-color:#006735 ;
-        border: solid;
-        border-radius: 7px;
-        height: 40px;
-    }
      @media print {
                 .no-print {
                     display: none;
@@ -75,13 +72,6 @@ if (!isset($_SESSION['secured'])) {
 
     .assign-to-dropdown {
         height: 30px;
-    }
-
-    .button-container2 {
-        display: flex;
-        align-items: center;
-        justify-content: space-between; 
-        margin: 20px;
     }
 
     .filter-search-container {
@@ -100,7 +90,7 @@ if (!isset($_SESSION['secured'])) {
     }
 
     .button {
-        background-color: #007bff;
+        background-color: #2a1aa1;
         color: white;
         padding: 8px 16px;
         border: none;
@@ -109,7 +99,7 @@ if (!isset($_SESSION['secured'])) {
     }
 
     .button:hover {
-        background-color: #0056b3;
+        background-color: #3725b3;
     }
 
     .rate-btn {
@@ -121,12 +111,12 @@ if (!isset($_SESSION['secured'])) {
     }
 
     .rate-btn.active {
-        background-color: #007bff;
+        background-color: #2a1aa1;
         color: white;
     }
 
     .rate-btn.disabled {
-        background-color: lightgray;
+        background-color: rgba(26, 12, 128, 0.3); /* 2% opacity */
         color: #666;
         cursor: not-allowed;
     }
@@ -149,11 +139,17 @@ if (!isset($_SESSION['secured'])) {
         border: 1px solid #888;
         width: 50%;
     }
+    .modal-content h1{
+        text-align: center;
+        padding-bottom: 20px;
+    }
     .close {
         float: right;
         font-size: 28px;
         font-weight: bold;
         cursor: pointer;
+        text-align: center;
+        width: 30px;
     }
     .close:hover,
     .close:focus {
@@ -171,18 +167,21 @@ if (!isset($_SESSION['secured'])) {
         padding: 8px;
     }
     .rating-table th {
-        background-color: #007bff;
+        background-color: #1a0c80;
         color: white;
     }
     .rating-table input[type="radio"] {
         transform: scale(1.2);
     }
+    .button-container {
+        text-align: center; /* Centers inline elements like buttons */
+        margin-top: 15px; /* Adjust spacing */
+    }
     .confirm-button {
-        background-color: #006735; 
+        background-color: #1a0c80;
         color: white;             
         border: none;              
-        padding: 7px 7px;       
-        text-align: center;        
+        padding: 7px 7px;   
         text-decoration: none;     
         display: inline-block;     
         margin: 4px 2px;         
@@ -190,7 +189,7 @@ if (!isset($_SESSION['secured'])) {
         border-radius: 5px;    
     }
     .confirm-button:hover {
-        background-color: #45a049; 
+        background-color: #3725b3; 
     }
 </style>
 
@@ -232,7 +231,7 @@ if (!isset($_SESSION['secured'])) {
     <div id="ratingModal" class="modal">
         <div class="modal-content">
             <span class="close" id="closeModal">&times;</span>
-            <h3>Satisfaction Survey</h3>
+            <h1>Satisfaction Survey</h1>
             <form id="ratingForm">
                 <table class="rating-table">
                     <thead>
@@ -270,7 +269,9 @@ if (!isset($_SESSION['secured'])) {
                         </tr>
                     </tbody>
                 </table>
-                <button type="submit" class="confirm-button">Submit Rating</button>
+                <div class="button-container">
+                    <button type="submit" class="confirm-button">Submit Rating</button>
+                </div>
             </form>
         </div>
     </div>

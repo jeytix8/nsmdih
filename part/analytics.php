@@ -32,6 +32,11 @@ while ($row = $resultJobOrders->fetch_assoc()) {
     max-height: 350px;
 }
 
+.card {
+    background-color: rgba(26, 12, 128, 0.05); /* 2% opacity */
+}
+
+
 .card-body {
     display: flex;
     justify-content: center;
