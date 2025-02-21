@@ -74,7 +74,8 @@ $sql = "SELECT id,
             timestamp_received, computer_name, model, ip_address, operating_system, remarks, 
             timestamp_remarks
         FROM records_job_order
-        WHERE assign_to IS NOT NULL 
+        WHERE status != 'Closed'
+          AND assign_to IS NOT NULL 
           AND assign_to != ''  
           AND (id LIKE '%$search%'
           OR name LIKE '%$search%'

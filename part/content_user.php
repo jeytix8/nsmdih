@@ -264,6 +264,9 @@ function openUserModal() {
     document.getElementById("userSection").value = "";
     document.getElementById("userModal").style.display = "block";
 }
+function closeUserModal() {
+    document.getElementById("userModal").style.display = "none";
+}
 
 // Delete user
 function deleteUser(id_no) {
