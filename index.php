@@ -29,7 +29,7 @@ if (!isset($_SESSION['secured'])) {
 	<head>
 		<base href="<?php echo $_SERVER['REQUEST_URI']; ?>">
 
-		<title>NSMDIH Job Order</title>
+		<title>NSMDIH Job Order System</title>
 		<script type="text/javascript" src="assets/media/jquery.js"></script>
 		<link rel="canonical" href="https://preview.keenthemes.com/metronic8" />
 		<link rel="shortcut icon" href="sinai_logo.png" />
@@ -49,8 +49,32 @@ if (!isset($_SESSION['secured'])) {
 		<div class="d-flex flex-column flex-root app-root" id="kt_app_root">
 			<!--begin::Page-->
 			<div class="app-page flex-column flex-column-fluid" id="kt_app_page">
-				<!--begin::Header-->
-				<!--end::Header-->
+
+				<!-- NAVIGATION BAR, but only show when mobile view if height is not setted-->
+				<div class="app-container container-fluid d-flex align-items-stretch justify-content-between" id="kt_app_header_container" style="background-color: darkblue;">
+					<!--begin::Mobile Toggle-->
+					<div class="d-flex align-items-center d-lg-none ms-n3 me-1 me-md-2" title="Show sidebar menu">
+						<div class="btn btn-icon btn-active-color-primary w-250px h-70px" id="kt_app_sidebar_mobile_toggle">
+							<i class="ki-duotone ki-abstract-14 fs-2 fs-md-1">
+								<span class="path1"></span>
+								<span class="path2"></span>
+							</i>
+							<h1 style="color:yellow; margin-left: 15px; padding-top: 10px;">Job Order System</h1>
+						</div>
+					</div>
+					<!--end::Mobile Toggle-->
+
+					<!-- Logo -->
+					<div class="d-flex align-items-center justify-content-end flex-grow-1 flex-lg-grow-0">
+					    <a href="index.php" class="d-lg-none d-flex align-items-center gap-2"> 
+					        <img alt="Logo" src="sinai_logo.png" class="h-30px">
+					    </a>
+					</div>
+
+					<!-- Logo end-->
+				</div>
+				<!-- NAV BAR END -->
+
 				<!--begin::Wrapper-->
 				<div class="app-wrapper flex-column flex-row-fluid" id="kt_app_wrapper">
 					<!--begin::Sidebar-->
@@ -73,13 +97,6 @@ if (!isset($_SESSION['secured'])) {
 			<!--end::Page-->
 		</div>
 		<!--end::App-->
-		<!--begin::Drawers-->
-
-		<!--begin::Activities drawer-->
-		<div id="kt_activities" class="bg-body" data-kt-drawer="true" data-kt-drawer-name="activities" data-kt-drawer-activate="true" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'300px', 'lg': '900px'}" data-kt-drawer-direction="end" data-kt-drawer-toggle="#kt_activities_toggle" data-kt-drawer-close="#kt_activities_close">
-
-		</div>
-		<!--end::Activities drawer-->
 		
 		<!--begin::Scrolltop-->
 		<div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">
