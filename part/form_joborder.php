@@ -89,7 +89,7 @@ ob_end_flush();
         position: absolute; 
         top: 50%; 
         left: 58%; 
-        height: 53vh;
+        height: 380px;
         transform: translate(-50%, -50%);
     }
 
@@ -108,6 +108,7 @@ ob_end_flush();
         text-align: center;
         color: white;
         padding: 10px;
+        margin-top: 7px;
         border: none;
         border-radius: 5px;
         cursor: pointer;
@@ -126,7 +127,6 @@ ob_end_flush();
         margin-bottom: 16px;
         border: 1px solid gray;
         border-radius: 5px;
-        font-size: 16px;
     }
 
     .form-control {
@@ -152,6 +152,9 @@ ob_end_flush();
         display: block;
         font-size: 13px;
         font-weight: bold;
+    }
+    .form-group select {
+        font-size: 11px;
     }
     
 
