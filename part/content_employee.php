@@ -190,6 +190,38 @@ while ($row = mysqli_fetch_assoc($employeeSectionResult)) {
         color: white;
     }
 
+
+
+    /* Rounded Square Upload Box */
+    .upload-label {
+        display: block;
+        width: 150px;
+        height: 150px;
+        border-radius: 15px;
+        border: 2px dashed #aaa;
+        text-align: center;
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    .image-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 15px;
+    }
+
+    .modal { display: none; /* Hide by default */ }
 </style>
 
 <div id="employee_management">
@@ -244,9 +276,30 @@ while ($row = mysqli_fetch_assoc($employeeSectionResult)) {
             <?php } ?>
         </select>
         <br><br>
+
+        <!-- Image Upload (Styled as Rounded Square) -->
+        <input type="file" id="employeeImage" accept="image/*" style="display: none;">
+        <label for="employeeImage" class="upload-label">
+            <div id="imagePreview" class="image-container">
+                <span>Click to Upload</span>
+            </div>
+        </label>
+
         <button class="insert-btn" onclick="saveEmployee()">Save</button>
     </div>
 </div>
+
+
+<!-- Croppie Modal (For Cropping & Adjusting Image) -->
+<div id="cropModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeCropModal()">&times;</span>
+        <h2>Adjust Your Image</h2>
+        <div id="croppieContainer"></div>  <!-- Croppie.js Container -->
+        <button class="insert-btn" onclick="cropAndSave()">Save Image</button>
+    </div>
+</div>
+
 
 <!-- Employee Table -->
 <table class='employee-table' id='employee_table'>
@@ -271,6 +324,9 @@ while ($row = mysqli_fetch_assoc($employeeSectionResult)) {
     </tbody>
 </table>
 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css">
 <script>
 function searchTable() {
     let input = document.getElementById("search-bar").value.toUpperCase();
@@ -344,22 +400,33 @@ function saveEmployee() {
     let id = document.getElementById("employeeId").value;
     let name = document.getElementById("employeeName").value.trim();
     let section = document.getElementById("employeeSection").value.trim();
+    let image = document.getElementById("employeeImage").file; // Get Cropped Image
 
     if (name === "" || section === "") {
         alert("Name and Section are required.");
         return;
     }
 
-    let postData = { name: name, section: section };
+    let formData = new FormData();
+    formData.append("name", name);
+    formData.append("section", section);
+    if (image) formData.append("image", image);
+
     let url = id ? 'part/update_employee.php' : 'part/insert_employee.php';
+    if (id) formData.append("id", id);
 
-    if (id) postData.id = id; // If updating, include employee ID
-
-    $.post(url, postData, function(response) {
-        alert(response);
+    fetch(url, {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        alert(data);
         location.reload();
-    });
+    })
+    .catch(error => console.error("Error:", error));
 }
+
 
 function deleteEmployee(id) {
     if (confirm("Are you sure you want to delete this employee?")) {
@@ -370,4 +437,54 @@ function deleteEmployee(id) {
     }
 }
 
+    let croppieInstance;
+
+    // Open File Picker When Clicked
+    document.getElementById("employeeImage").addEventListener("change", function(event) {
+        let file = event.target.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                openCropModal(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Open Croppie Modal
+    function openCropModal(imageSrc) {
+        let cropModal = document.getElementById("cropModal");
+        cropModal.style.display = "block";
+
+        // Initialize Croppie
+        if (croppieInstance) {
+            croppieInstance.destroy(); // Destroy previous instance
+        }
+        croppieInstance = new Croppie(document.getElementById("croppieContainer"), {
+            viewport: { width: 150, height: 150, type: "square" }, // Crop area
+            boundary: { width: 200, height: 200 },
+            enableExif: true
+        });
+
+        croppieInstance.bind({ url: imageSrc });
+    }
+
+    // Crop & Save Image
+    function cropAndSave() {
+        croppieInstance.result({ type: "blob", size: { width: 300, height: 300 }, quality: 0.8 }).then(function(blob) {
+            let imageURL = URL.createObjectURL(blob);
+            document.getElementById("imagePreview").innerHTML = `<img src="${imageURL}">`; // Show preview
+
+            // Store in FormData
+            let imageInput = new File([blob], "cropped_image.jpg", { type: "image/jpeg" });
+            document.getElementById("employeeImage").file = imageInput;
+
+            closeCropModal();
+        });
+    }
+
+    // Close Crop Modal
+    function closeCropModal() {
+        document.getElementById("cropModal").style.display = "none";
+    }
 </script>
