@@ -42,25 +42,44 @@ $section = isset($_GET['section']) ? $_GET['section'] : $default_section_tab;  /
                         else if ($section == 'request') {
                             include "content_joborder_requests.php";
                         }
-                    }
-
-                    if ($section == 'assignment') {
-                        include "content_joborder_assignment.php";
-                    }
-                    elseif ($section == 'records') {
-                        include "content_joborder_records.php";
-                    }
-                    elseif ($section == 'category_section') {
-                        include "content_category.php";
-                    }
-                    elseif ($section == 'user_account') {
-                        include "content_user.php";
-                    }
-                    elseif ($section == 'employee_section') {
-                        include "content_employee.php";
+                        else if ($section == 'assignment') {
+                            include "content_joborder_assignment.php";
+                        }
+                        elseif ($section == 'records') {
+                            include "content_joborder_records.php";
+                        }
+                        elseif ($section == 'category_section') {
+                            include "content_category.php";
+                        }
+                        elseif ($section == 'user_account') {
+                            include "content_user.php";
+                        }
+                        elseif ($section == 'employee_section') {
+                            include "content_employee.php";
+                        }
+                        else{
+                            echo "<p>Invalid section. Please select a valid section from the sidebar.</p>";
+                        }
                     }
                     else{
-                        echo "<p>Invalid section. Please select a valid section from the sidebar.</p>";
+                        if ($section == 'assignment') {
+                            include "content_joborder_assignment.php";
+                        }
+                        elseif ($section == 'records') {
+                            include "content_joborder_records.php";
+                        }
+                        elseif ($section == 'category_section') {
+                            include "content_category.php";
+                        }
+                        elseif ($section == 'user_account') {
+                            include "content_user.php";
+                        }
+                        elseif ($section == 'employee_section') {
+                            include "content_employee.php";
+                        }
+                        else{
+                            echo "<p>Invalid section. Please select a valid section from the sidebar.</p>";
+                        }
                     }
                 } 
                 else {
