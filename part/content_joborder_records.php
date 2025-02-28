@@ -99,11 +99,10 @@ if (!isset($_SESSION['secured'])) {
 
     }
 
-     .button-container2 {
+    .button-container2 {
         display: flex;
         justify-content: space-between;
         margin: 20px;
-
     }
 
     .dropdown2-btn{

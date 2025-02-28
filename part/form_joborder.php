@@ -18,9 +18,45 @@ if (!isset($_SESSION['secured']) || !isset($_SESSION['user_section'])) {
 
 $user_section = $_SESSION['user_section']; // User's section
 
-$job_orders = [];
+// **Single Query to Fetch Employees (Handles Both Dropdown & Image Fetching)**
+$emp_stmt = $conn->prepare("SELECT name, image_data FROM employees WHERE section = ? ORDER BY name ASC");
+$emp_stmt->bind_param("s", $user_section);
+$emp_stmt->execute();
+$emp_stmt->bind_result($emp_name, $emp_image);
 
-// Fetch job orders
+$employees = [];
+while ($emp_stmt->fetch()) {
+    $employees[] = [
+        'name' => $emp_name,
+        'image' => $emp_image ? 'data:image/jpeg;base64,' . base64_encode($emp_image) : 'placeholder.png'
+    ];
+}
+
+// **Check if a specific image needs to be served**
+if (isset($_GET['name'])) {
+    $name = $_GET['name'];
+
+    foreach ($employees as $emp) {
+        if ($emp['name'] === $name) {
+            if ($emp['image'] !== 'placeholder.png') {
+                header("Content-Type: image/jpeg"); // Adjust if needed
+                echo base64_decode(explode(',', $emp['image'])[1]); // Decode base64 back to binary
+            } else {
+                header("Content-Type: image/png");
+                readfile("../placeholder.png");
+            }
+            exit(); // **Stop script after serving image**
+        }
+    }
+
+    // If name not found, return placeholder
+    header("Content-Type: image/png");
+    readfile("../placeholder.png");
+    exit();
+}
+
+// **Fetch job orders**
+$job_orders = [];
 $job_stmt = $conn->prepare("SELECT category FROM category_job_order ORDER BY category ASC");
 $job_stmt->execute();
 $job_stmt->bind_result($job_order);
@@ -29,17 +65,8 @@ while ($job_stmt->fetch()) {
 }
 $job_stmt->close();
 
-// Fetch employees for the name dropdown
-$employees = [];
-$emp_stmt = $conn->prepare("SELECT name FROM employees WHERE section = ? ORDER BY name ASC");
-$emp_stmt->bind_param("s", $user_section);
-$emp_stmt->execute();
-$emp_stmt->bind_result($emp_name);
-while ($emp_stmt->fetch()) {
-    $employees[] = $emp_name;
-}
-$emp_stmt->close();
 
+// **Handle Form Submission**
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'] ?? '';
     $section = $_SESSION['user_section']; // Set from session
@@ -73,6 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $conn->close();
 ob_end_flush();
 ?>
+
 
 
 <!-- HTML and CSS code remains the same as you provided -->
@@ -146,6 +174,7 @@ ob_end_flush();
 
     .form-group {
         text-align: left; 
+        margin-left: 5px;
     }
 
     .form-group label {
@@ -167,35 +196,36 @@ ob_end_flush();
         <form id="reportForm">
 
             <div class="form-row">
+                <!-- Image Preview Box -->
+                <img id="profileImage" src="part/form_joborder.php?name=" alt="Employee Image" style="width: 200px; height: 200px; border-radius: 10px; border: 1px solid gray; object-fit: cover;">
+                
+
+                <!-- Name Dropdown -->
                 <div class="form-group">
                     <label for="name">Name</label>
                     <select id="name" name="name" class="form-control" required>
                         <option value="" disabled selected>Select Name</option>
                         <?php foreach ($employees as $emp): ?>
-                            <option value="<?php echo htmlspecialchars($emp); ?>"><?php echo htmlspecialchars($emp); ?></option>
+                            <option value="<?php echo htmlspecialchars($emp['name']); ?>" 
+                                    data-image="<?php echo htmlspecialchars($emp['image']); ?>">
+                                <?php echo htmlspecialchars($emp['name']); ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
+
+
+                    <label for="job_order_nature">Nature of Job Order</label>
+                    <select id="job_order_nature" name="job_order_nature" class="form-control" required>
+                        <option value="" disabled selected>Select Nature of Job Order</option>
+                        <?php foreach ($job_orders as $job_order): ?>
+                            <option value="<?php echo htmlspecialchars($job_order); ?>"><?php echo htmlspecialchars($job_order); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+
+
+                    <label for="description">Description</label>
+                    <input type="text" id="description" name="description" class="form-control" placeholder="Enter description" required>
                 </div>
-
-                <div class="form-group">
-                    <label for="section">Section</label>
-                    <input type="text" id="section" name="section" class="form-control" value="<?php echo htmlspecialchars($_SESSION['user_section']); ?>" readonly>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="job_order_nature">Nature of Job Order</label>
-                <select id="job_order_nature" name="job_order_nature" class="form-control" required>
-                    <option value="" disabled selected>Select Nature of Job Order</option>
-                    <?php foreach ($job_orders as $job_order): ?>
-                        <option value="<?php echo htmlspecialchars($job_order); ?>"><?php echo htmlspecialchars($job_order); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="description">Description</label>
-                <input type="text" id="description" name="description" class="form-control" placeholder="Enter description">
             </div>
 
             <button type="submit" id="button">Submit</button>
@@ -205,6 +235,16 @@ ob_end_flush();
 
 
 <script>
+document.getElementById('name').addEventListener('change', function() {
+    let selectedName = this.value;
+    let profileImage = document.getElementById('profileImage');
+
+    if (selectedName) {
+        profileImage.src = "part/form_joborder.php?name=" + encodeURIComponent(selectedName);
+    }
+});
+
+
 document.getElementById('reportForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
@@ -223,6 +263,9 @@ document.getElementById('reportForm').addEventListener('submit', function(event)
                 text: 'Your report has been successfully submitted!',
             });
             this.reset();
+            // Reset image preview to placeholder
+            document.getElementById('profileImage').src = "placeholder.png"; 
+
         } else {
             Swal.fire({
                 icon: 'error',

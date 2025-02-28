@@ -46,8 +46,7 @@ $result = mysqli_query($conn, $query);
     .button-container2 {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
+        margin: 20px;
     }
     #search-bar {
         width: 100%;
