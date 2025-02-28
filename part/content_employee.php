@@ -10,8 +10,8 @@ if (!isset($_SESSION['secured'])) {
 
 require_once 'connect.php';
 
-// Fetch employees for table
-$query = "SELECT id, name, section FROM employees ORDER BY id ASC";
+// Fetch employees including images
+$query = "SELECT id, name, section, image_data FROM employees ORDER BY id ASC";
 $result = mysqli_query($conn, $query);
 
 // Fetch DISTINCT sections for dropdown (Add/Update Modal) from `accounts.section`
@@ -90,12 +90,8 @@ while ($row = mysqli_fetch_assoc($employeeSectionResult)) {
     }
     .button-container2 {
         display: flex;
-        justify-content: space-between; /* Align left & right */
-        align-items: center;
-        margin-bottom: 10px;
-        background: #f5f5f5; /* Optional: Light background like in the image */
-        padding: 10px;
-        border-radius: 5px;
+        justify-content: space-between;
+        margin: 20px;
     }
 
     /* Left side (Search & Filter) */
@@ -189,8 +185,6 @@ while ($row = mysqli_fetch_assoc($employeeSectionResult)) {
         background-color: #d32f2f;
         color: white;
     }
-
-
 
     /* Rounded Square Upload Box */
     .upload-label {
@@ -305,14 +299,21 @@ while ($row = mysqli_fetch_assoc($employeeSectionResult)) {
 <table class='employee-table' id='employee_table'>
     <thead>
         <tr>
-            <th onclick="sortTable(0, this)">Name <i class="fas fa-sort"></i></th>
-            <th onclick="sortTable(1, this)">Section <i class="fas fa-sort"></i></th>
+            <th onclick="sortTable(0, this)">ID <i class="fas fa-sort"></i></th>
+            <th>Image</th>
+            <th onclick="sortTable(2, this)">Name <i class="fas fa-sort"></i></th>
+            <th onclick="sortTable(3, this)">Section <i class="fas fa-sort"></i></th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        <?php while ($row = $result->fetch_assoc()) { ?>
+        <?php while ($row = mysqli_fetch_assoc($result)) { 
+            // Convert BLOB image to Base64 (if exists)
+            $imageSrc = (!empty($row['image_data'])) ? 'data:image/jpeg;base64,' . base64_encode($row['image_data']) : 'placeholder.png';
+        ?>
             <tr>
+                <td><?php echo $row['id']; ?></td> <!-- ID Column -->
+                <td><img src="<?php echo $imageSrc; ?>" alt="Employee Image" style="width: 45px; height: 45px; border-radius: 5px; object-fit: cover;"></td>
                 <td><?php echo htmlspecialchars($row['name']); ?></td>
                 <td><?php echo htmlspecialchars($row['section']); ?></td>
                 <td>
@@ -323,7 +324,6 @@ while ($row = mysqli_fetch_assoc($employeeSectionResult)) {
         <?php } ?>
     </tbody>
 </table>
-
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css">
@@ -348,34 +348,49 @@ function sortTable(columnIndex, headerElement) {
     let order = headerElement.getAttribute("data-sort-order") === "asc" ? "desc" : "asc";
 
     rows.sort((a, b) => {
-        let cellA = a.cells[columnIndex].innerText.toUpperCase();
-        let cellB = b.cells[columnIndex].innerText.toUpperCase();
-        return order === "asc" ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+        let cellA = a.cells[columnIndex];
+        let cellB = b.cells[columnIndex];
+
+        // Skip sorting for the Image column (Index 1)
+        if (columnIndex === 1) return 0;
+
+        let textA = cellA.innerText || cellA.textContent;
+        let textB = cellB.innerText || cellB.textContent;
+
+        // If sorting ID column (numeric sorting)
+        if (columnIndex === 0) {
+            return order === "asc" ? textA - textB : textB - textA;
+        }
+
+        // Otherwise, sort alphabetically
+        return order === "asc" ? textA.localeCompare(textB) : textB.localeCompare(textA);
     });
 
     rows.forEach(row => table.appendChild(row));
     headerElement.setAttribute("data-sort-order", order);
 }
 
+
 function filterEmployees() {
     let searchValue = document.getElementById("search-bar").value.toUpperCase();
     let selectedSections = Array.from(document.querySelectorAll(".section-filter:checked"))
-        .map(checkbox => checkbox.value.toUpperCase()); // Convert filter values to uppercase
+        .map(checkbox => checkbox.value.toUpperCase());
 
     let table = document.getElementById("employee_table");
     let rows = table.getElementsByTagName("tr");
 
     for (let i = 1; i < rows.length; i++) {
-        let nameCell = rows[i].getElementsByTagName("td")[0].innerText.toUpperCase();
-        let sectionCell = rows[i].getElementsByTagName("td")[1].innerText.toUpperCase();
+        let idCell = rows[i].getElementsByTagName("td")[0].innerText.toUpperCase();
+        let nameCell = rows[i].getElementsByTagName("td")[2].innerText.toUpperCase();
+        let sectionCell = rows[i].getElementsByTagName("td")[3].innerText.toUpperCase();
 
-        let matchesSearch = nameCell.includes(searchValue);
+        let matchesSearch = idCell.includes(searchValue) || nameCell.includes(searchValue);
         let matchesFilter = selectedSections.length === 0 || selectedSections.includes(sectionCell);
 
-        // Show row only if both conditions are met
         rows[i].style.display = matchesSearch && matchesFilter ? "" : "none";
     }
 }
+
 
 function openEmployeeModal() {
     document.getElementById("modalTitle").innerText = "Add New Employee";
