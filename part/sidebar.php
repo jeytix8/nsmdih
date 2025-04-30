@@ -20,10 +20,10 @@ $currentSection = isset($_GET['section']) ? $_GET['section'] : 'dashboard'; // D
    	}
 
     .menu-link:hover {
-        background-color: #130863;
+        background-color: #120960;
     }
     .menu-link.active {
-        background-color: #130863 !important;
+        background-color: #120960 !important;
         color: white !important;
     }
     .menu-item .menu-title  {
@@ -31,7 +31,7 @@ $currentSection = isset($_GET['section']) ? $_GET['section'] : 'dashboard'; // D
     }
 
     #kt_app_sidebar {
-        background-color: #090145;
+        background-color: #0b0246;
     }
 
     .menu-item .menu-arrow{
